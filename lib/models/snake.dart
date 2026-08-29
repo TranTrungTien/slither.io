@@ -34,6 +34,7 @@ class SnakeEntity with _$SnakeEntity {
     required bool dead,
     required int eliminations,
     @Default(0.0) double boostTimer,
+    @Default(Vector2.zero()) @Vector2Converter() Vector2 previousDropPosition,
   }) = _SnakeEntity;
 
   factory SnakeEntity.fromJson(Map<String, dynamic> json) => _$SnakeEntityFromJson(json);

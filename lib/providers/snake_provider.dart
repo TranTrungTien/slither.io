@@ -11,12 +11,13 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
   SnakeNotifier() : super({});
 
   void addSnake(String id, {String? name, Vector2? head, String? skin, int? score}) {
+    final headPos = head ?? Vector2.zero();
     state = {
       ...state,
       id: SnakeEntity(
         id: id,
         name: name ?? id,
-        head: head ?? Vector2.zero(),
+        head: headPos,
         angle: 0,
         desiredAngle: 0,
         score: score ?? GameConstants.initialScore,
@@ -25,6 +26,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
         skin: skin ?? 'default',
         dead: false,
         eliminations: 0,
+        previousDropPosition: headPos,
       ),
     };
   }
@@ -56,7 +58,13 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
   void incrementScore(String id, int amount) {
     final snake = state[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(score: snake.score + amount)};
+    state = {...state, id: snake.copyWith(score: math.max(0, snake.score + amount))};
+  }
+
+  void incrementEliminations(String id) {
+    final snake = state[id];
+    if (snake == null) return;
+    state = {...state, id: snake.copyWith(eliminations: snake.eliminations + 1)};
   }
 
   void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
@@ -71,16 +79,24 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
 
       double currentBoostTimer = snake.boostTimer;
       int currentScore = snake.score;
+      Vector2 previousDropPosition = snake.previousDropPosition;
 
       if (snake.isBoosting) {
         currentBoostTimer += dt;
         if (currentBoostTimer >= 0.15) {
           currentBoostTimer = 0.0;
-          final int drain = (3 + 0.001 * currentScore).round().clamp(2, 10);
+          final int maxDecrease = (3 + 0.001 * currentScore).round().clamp(2, 10);
+          final int drain = math.Random().nextInt(maxDecrease - 1) + 1;
           currentScore = math.max(0, currentScore - drain);
 
-          if (snake.tracers.isNotEmpty && onBoostDrop != null) {
-            onBoostDrop(snake.tracers.last, drain);
+          final description = snake.copyWith(score: currentScore).describe();
+          final tail = snake.tracers.isNotEmpty ? snake.tracers.last : null;
+
+          if (tail != null && onBoostDrop != null) {
+            if (tail.distanceTo(previousDropPosition) > description.radius * 2) {
+              previousDropPosition = tail.clone();
+              onBoostDrop(tail, drain);
+            }
           }
         }
       } else {
@@ -96,46 +112,41 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
 
       final int currentLength = snake.tracers.length;
       final int desiredLength = description.length.floor();
-      Vector2 currentTail = head.clone();
+      Vector2 tailVar = head.clone();
 
       final List<Vector2> nextTracers = [];
 
       for (int i = 0; i < desiredLength; i++) {
-        final Vector2 prev = i == 0 ? head : nextTracers[i - 1];
-
-        final double spacing = map(
-          i.toDouble(),
-          0,
-          math.max(1.0, currentLength.toDouble()),
-          description.spacingAtHead,
-          description.spacingAtTail,
-        );
-
-        final double alpha = ((dt * speed) / spacing).clamp(tiny, 1.0 - tiny);
-
-        Vector2 nextTracerPos;
         if (i < currentLength) {
-          final Vector2 currentInState = snake.tracers[i];
-          // Break down lerp calls to avoid any potential compiler issues with chaining
-          final Vector2 interpolated = currentInState.clone();
-          interpolated.lerp(prev, alpha);
+          final Vector2 tracer = snake.tracers[i];
+          final Vector2 previous = i == 0 ? snake.head : snake.tracers[i - 1];
+
+          final double spacing = map(
+            i.toDouble(),
+            0,
+            math.max(1.0, currentLength.toDouble()),
+            description.spacingAtHead,
+            description.spacingAtTail,
+          );
+
+          final double alpha = ((dt * speed) / spacing).clamp(tiny, 1.0 - tiny);
 
           if (i == desiredLength - 1) {
             final double stretch = math.max(description.length % 1, tiny);
-            final Vector2 stretchTarget = currentTail.clone();
-            stretchTarget.lerp(interpolated, stretch);
-            nextTracerPos = stretchTarget;
+            final Vector2 lerped = tracer.clone()..lerp(previous, alpha);
+            tailVar = tailVar.clone()..lerp(lerped, stretch);
           } else {
-            final Vector2 followTarget = currentTail.clone();
-            followTarget.lerp(interpolated, 1.0);
-            nextTracerPos = followTarget;
+            tailVar = tracer.clone()..lerp(previous, alpha);
           }
-        } else {
-          nextTracerPos = currentTail + Vector2(tiny * (i + 1), 0);
+          nextTracers.add(tailVar.clone());
         }
+      }
 
-        currentTail = nextTracerPos;
-        nextTracers.add(currentTail.clone());
+      if (currentLength < desiredLength) {
+        for (int i = currentLength; i < desiredLength; i++) {
+          final Vector2 newTracer = tailVar + Vector2(tiny * (i + 1), 0);
+          nextTracers.add(newTracer);
+        }
       }
 
       newState[id] = snake.copyWith(
@@ -143,6 +154,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
         angle: angle,
         score: currentScore,
         boostTimer: currentBoostTimer,
+        previousDropPosition: previousDropPosition,
         tracers: nextTracers,
       );
     });

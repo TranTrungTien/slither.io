@@ -29,21 +29,22 @@ class CollisionSystem {
   }) {
     updateSnakeGrid(snakes);
 
-    final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
+    final sortedSnakes = snakes.values.toList()..sort((a, b) => a.score.compareTo(b.score));
 
     for (final snake in sortedSnakes) {
       if (snake.dead) continue;
 
       final description = snake.describe();
-      final radius = description.radius * 10;
+      final radius = description.radius * 10.0;
 
-      if (snake.head.length + description.radius > GameConstants.worldBounds) {
+      if (snake.head.length + radius > GameConstants.worldBounds) {
         onHitWall(snake.id);
         continue;
       }
 
       final nearest = snakeGrid.nearest(snake.head, radius + 5.0, (point) {
         if (point.metadata == snake.id) {
+          // Prevent colliding with own head/immediate neck
           return snake.head.distanceTo(point.position) > radius * 2.5;
         }
         return true;
@@ -52,7 +53,7 @@ class CollisionSystem {
       if (nearest != null) {
         final enemy = snakes[nearest.metadata];
         if (enemy != null && !enemy.dead) {
-          final enemyRadius = enemy.describe().radius * 10;
+          final enemyRadius = enemy.describe().radius * 10.0;
           final distance = snake.head.distanceTo(nearest.position);
 
           if (distance <= 0.8 * (radius + enemyRadius)) {
