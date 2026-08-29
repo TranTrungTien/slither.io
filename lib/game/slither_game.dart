@@ -7,8 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/constants.dart';
 import '../providers/snake_provider.dart';
 import '../providers/candy_provider.dart';
+import '../providers/alert_provider.dart';
+import '../utils/audio_service.dart';
 import '../models/snake.dart';
 import '../models/candy.dart';
+import '../models/alert.dart';
 import '../models/skin_presets.dart';
 import 'components/snake_component.dart';
 import 'components/candy_component.dart';
@@ -20,6 +23,11 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   final WidgetRef ref;
   final CollisionSystem _collisionSystem = CollisionSystem();
   final Map<String, BotAI> _botAIs = {};
+
+  // Cache components to avoid O(N) lookups in children list
+  final Map<String, SnakeComponent> _snakeComponents = {};
+  final Map<String, CandyComponent> _candyComponents = {};
+
   static const int minSnakes = 20;
   int? _lastRank;
 
@@ -27,7 +35,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
 
   @override
   Future<void> onLoad() async {
-    add(WorldBounds());
+    world.add(WorldBounds());
 
     Future.microtask(() {
       spawnPlayer();
@@ -101,17 +109,17 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
        ));
     });
 
+    final updatedSnakes = ref.read(snakeProvider);
+    final updatedCandies = ref.read(candyProvider);
+
     _collisionSystem.checkCollisions(
-      snakes: snakes,
-      candies: candies,
+      snakes: updatedSnakes,
+      candies: updatedCandies,
       onEatCandy: (candyId, snakeId) {
         final candy = ref.read(candyProvider)[candyId];
         if (candy != null) {
           ref.read(snakeProvider.notifier).incrementScore(snakeId, candy.size);
           ref.read(candyProvider.notifier).removeCandy(candyId);
-          if (snakeId == 'local_player') {
-             // AudioService.play(SlitherSound.whoosh, volume: 0.5); // Optional
-          }
         }
       },
       onHitWall: (snakeId) {
@@ -138,7 +146,8 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       camera.viewfinder.position = localSnake.head;
 
       final description = localSnake.describe();
-      final double targetZoom = 1.5 / (description.radius * 0.2 + 1.0);
+      // Adjust zoom logic for larger snakes
+      final double targetZoom = 1.2 / (description.radius * 0.05 + 1.0);
       camera.viewfinder.zoom = targetZoom;
 
       // Rank alert
@@ -246,34 +255,51 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     final snakes = ref.read(snakeProvider);
     final candies = ref.read(candyProvider);
 
-    children.whereType<SnakeComponent>().forEach((c) {
-      if (!snakes.containsKey(c.id)) c.removeFromParent();
-    });
+    // 1. Sync Snakes
+    final snakeIdsToRemove = _snakeComponents.keys.where((id) => !snakes.containsKey(id)).toList();
+    for (final id in snakeIdsToRemove) {
+      _snakeComponents.remove(id)?.removeFromParent();
+    }
 
     for (final snake in snakes.values) {
-      final existing = children.whereType<SnakeComponent>().where((c) => c.id == snake.id);
-      if (existing.isEmpty) {
-        add(SnakeComponent(snake.id)..updateEntity(snake));
+      final existing = _snakeComponents[snake.id];
+      if (existing == null) {
+        final comp = SnakeComponent(snake.id)..updateEntity(snake);
+        _snakeComponents[snake.id] = comp;
+        world.add(comp);
       } else {
-        existing.first.updateEntity(snake);
+        existing.updateEntity(snake);
       }
     }
 
+    // 2. Sync Candies (Frustum Culling + ID Caching)
     final viewport = camera.visibleWorldRect;
+
+    // Cleanup removed candies
+    final candyIdsToRemove = _candyComponents.keys.where((id) => !candies.containsKey(id)).toList();
+    for (final id in candyIdsToRemove) {
+      _candyComponents.remove(id)?.removeFromParent();
+    }
+
     for (final candy in candies.values) {
       if (candy.eatenAt != null) continue;
 
       final isVisible = viewport.contains(candy.position.toOffset());
-      final existing = children.whereType<CandyComponent>().where((c) => c.id == candy.id);
+      final existing = _candyComponents[candy.id];
 
       if (isVisible) {
-        if (existing.isEmpty) {
-          add(CandyComponent(candy.id)..updateEntity(candy));
+        if (existing == null) {
+          final comp = CandyComponent(candy.id)..updateEntity(candy);
+          _candyComponents[candy.id] = comp;
+          world.add(comp);
         } else {
-          existing.first.updateEntity(candy);
+          existing.updateEntity(candy);
         }
-      } else if (existing.isNotEmpty) {
-        existing.first.removeFromParent();
+      } else {
+        if (existing != null) {
+          _candyComponents.remove(candy.id);
+          existing.removeFromParent();
+        }
       }
     }
   }

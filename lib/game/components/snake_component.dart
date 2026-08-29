@@ -9,6 +9,16 @@ class SnakeComponent extends Component {
   final String id;
   SnakeEntity? _entity;
 
+  // Reuse paint objects to avoid allocation in render()
+  final Paint _bodyPaint = Paint();
+  final Paint _headPaint = Paint();
+  final Paint _outlinePaint = Paint()
+    ..color = Colors.black.withAlpha(50)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.5;
+  final Paint _glowPaint = Paint()
+    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10.0);
+
   SnakeComponent(this.id);
 
   void updateEntity(SnakeEntity entity) {
@@ -21,14 +31,18 @@ class SnakeComponent extends Component {
     if (entity == null || entity.dead) return;
 
     final description = entity.describe();
-    final radius = description.radius * 10;
+    final radius = description.radius;
 
     final skin = SkinPresets.getById(entity.skin);
-    final bodyPaint = Paint()..color = skin.primary ?? CatppuccinColors.mauve;
-    final headPaint = Paint()..color = skin.primary?.withValues(red: 200) ?? CatppuccinColors.mauve.withValues(red: 200);
+    _bodyPaint.color = skin.primary ?? CatppuccinColors.mauve;
+    _headPaint.color = skin.primary?.withValues(red: 200) ?? CatppuccinColors.mauve.withValues(red: 200);
 
     // 1. Draw body tracers
-    for (int i = entity.tracers.length - 1; i >= 0; i--) {
+    // Performance: If there are too many tracers, we can skip some for rendering
+    // since they overlap significantly in "To và Khít" mode.
+    const int renderStep = 2;
+
+    for (int i = entity.tracers.length - 1; i >= 0; i -= renderStep) {
       final pos = entity.tracers[i];
 
       final List<Color> tints = (entity.isBoosting && skin.boostTint != null)
@@ -36,20 +50,20 @@ class SnakeComponent extends Component {
           : skin.tint;
 
       if (tints.isNotEmpty) {
-        bodyPaint.color = tints[i % tints.length];
+        _bodyPaint.color = tints[i % tints.length];
       }
 
-      canvas.drawCircle(pos.toOffset(), radius, bodyPaint);
-
-      final outlinePaint = Paint()
-        ..color = Colors.black.withAlpha(50)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5;
-      canvas.drawCircle(pos.toOffset(), radius, outlinePaint);
+      canvas.drawCircle(pos.toOffset(), radius, _bodyPaint);
+      canvas.drawCircle(pos.toOffset(), radius, _outlinePaint);
     }
 
     // 2. Draw head
-    canvas.drawCircle(entity.head.toOffset(), radius * 1.2, headPaint);
+    canvas.drawCircle(entity.head.toOffset(), radius * 1.2, _headPaint);
+
+    // Boost glow
+    if (entity.isBoosting) {
+      canvas.drawCircle(entity.head.toOffset(), radius * 1.5, _glowPaint..color = (skin.primary ?? CatppuccinColors.mauve).withAlpha(100));
+    }
 
     // 3. Eyes
     final eyePaint = Paint()..color = Colors.white;

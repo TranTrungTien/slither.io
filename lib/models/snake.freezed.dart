@@ -240,6 +240,8 @@ mixin _$SnakeEntity {
   bool get dead => throw _privateConstructorUsedError;
   int get eliminations => throw _privateConstructorUsedError;
   double get boostTimer => throw _privateConstructorUsedError;
+  @Vector2Converter()
+  Vector2? get previousDropPosition => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -265,7 +267,8 @@ abstract class $SnakeEntityCopyWith<$Res> {
       String skin,
       bool dead,
       int eliminations,
-      double boostTimer});
+      double boostTimer,
+      @Vector2Converter() Vector2? previousDropPosition});
 }
 
 /// @nodoc
@@ -293,6 +296,7 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
     Object? dead = null,
     Object? eliminations = null,
     Object? boostTimer = null,
+    Object? previousDropPosition = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -343,6 +347,10 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
           ? _value.boostTimer
           : boostTimer // ignore: cast_nullable_to_non_nullable
               as double,
+      previousDropPosition: freezed == previousDropPosition
+          ? _value.previousDropPosition
+          : previousDropPosition // ignore: cast_nullable_to_non_nullable
+              as Vector2?,
     ) as $Val);
   }
 }
@@ -367,7 +375,8 @@ abstract class _$$SnakeEntityImplCopyWith<$Res>
       String skin,
       bool dead,
       int eliminations,
-      double boostTimer});
+      double boostTimer,
+      @Vector2Converter() Vector2? previousDropPosition});
 }
 
 /// @nodoc
@@ -393,6 +402,7 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
     Object? dead = null,
     Object? eliminations = null,
     Object? boostTimer = null,
+    Object? previousDropPosition = freezed,
   }) {
     return _then(_$SnakeEntityImpl(
       id: null == id
@@ -443,6 +453,10 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
           ? _value.boostTimer
           : boostTimer // ignore: cast_nullable_to_non_nullable
               as double,
+      previousDropPosition: freezed == previousDropPosition
+          ? _value.previousDropPosition
+          : previousDropPosition // ignore: cast_nullable_to_non_nullable
+              as Vector2?,
     ));
   }
 }
@@ -462,7 +476,8 @@ class _$SnakeEntityImpl extends _SnakeEntity {
       required this.skin,
       required this.dead,
       required this.eliminations,
-      this.boostTimer = 0.0})
+      this.boostTimer = 0.0,
+      @Vector2Converter() this.previousDropPosition})
       : _tracers = tracers,
         super._();
 
@@ -502,10 +517,13 @@ class _$SnakeEntityImpl extends _SnakeEntity {
   @override
   @JsonKey()
   final double boostTimer;
+  @override
+  @Vector2Converter()
+  final Vector2? previousDropPosition;
 
   @override
   String toString() {
-    return 'SnakeEntity(id: $id, name: $name, head: $head, angle: $angle, desiredAngle: $desiredAngle, score: $score, boost: $boost, tracers: $tracers, skin: $skin, dead: $dead, eliminations: $eliminations, boostTimer: $boostTimer)';
+    return 'SnakeEntity(id: $id, name: $name, head: $head, angle: $angle, desiredAngle: $desiredAngle, score: $score, boost: $boost, tracers: $tracers, skin: $skin, dead: $dead, eliminations: $eliminations, boostTimer: $boostTimer, previousDropPosition: $previousDropPosition)';
   }
 
   @override
@@ -527,7 +545,9 @@ class _$SnakeEntityImpl extends _SnakeEntity {
             (identical(other.eliminations, eliminations) ||
                 other.eliminations == eliminations) &&
             (identical(other.boostTimer, boostTimer) ||
-                other.boostTimer == boostTimer));
+                other.boostTimer == boostTimer) &&
+            (identical(other.previousDropPosition, previousDropPosition) ||
+                other.previousDropPosition == previousDropPosition));
   }
 
   @JsonKey(ignore: true)
@@ -545,7 +565,8 @@ class _$SnakeEntityImpl extends _SnakeEntity {
       skin,
       dead,
       eliminations,
-      boostTimer);
+      boostTimer,
+      previousDropPosition);
 
   @JsonKey(ignore: true)
   @override
@@ -563,18 +584,20 @@ class _$SnakeEntityImpl extends _SnakeEntity {
 
 abstract class _SnakeEntity extends SnakeEntity {
   const factory _SnakeEntity(
-      {required final String id,
-      required final String name,
-      @Vector2Converter() required final Vector2 head,
-      required final double angle,
-      required final double desiredAngle,
-      required final int score,
-      required final bool boost,
-      @Vector2Converter() required final List<Vector2> tracers,
-      required final String skin,
-      required final bool dead,
-      required final int eliminations,
-      final double boostTimer}) = _$SnakeEntityImpl;
+          {required final String id,
+          required final String name,
+          @Vector2Converter() required final Vector2 head,
+          required final double angle,
+          required final double desiredAngle,
+          required final int score,
+          required final bool boost,
+          @Vector2Converter() required final List<Vector2> tracers,
+          required final String skin,
+          required final bool dead,
+          required final int eliminations,
+          final double boostTimer,
+          @Vector2Converter() final Vector2? previousDropPosition}) =
+      _$SnakeEntityImpl;
   const _SnakeEntity._() : super._();
 
   factory _SnakeEntity.fromJson(Map<String, dynamic> json) =
@@ -606,6 +629,9 @@ abstract class _SnakeEntity extends SnakeEntity {
   int get eliminations;
   @override
   double get boostTimer;
+  @override
+  @Vector2Converter()
+  Vector2? get previousDropPosition;
   @override
   @JsonKey(ignore: true)
   _$$SnakeEntityImplCopyWith<_$SnakeEntityImpl> get copyWith =>

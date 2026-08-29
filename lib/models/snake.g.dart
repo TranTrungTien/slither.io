@@ -24,6 +24,9 @@ _$SnakeEntityImpl _$$SnakeEntityImplFromJson(Map<String, dynamic> json) =>
       dead: json['dead'] as bool,
       eliminations: (json['eliminations'] as num).toInt(),
       boostTimer: (json['boostTimer'] as num?)?.toDouble() ?? 0.0,
+      previousDropPosition:
+          _$JsonConverterFromJson<Map<String, dynamic>, Vector2>(
+              json['previousDropPosition'], const Vector2Converter().fromJson),
     );
 
 Map<String, dynamic> _$$SnakeEntityImplToJson(_$SnakeEntityImpl instance) =>
@@ -40,4 +43,19 @@ Map<String, dynamic> _$$SnakeEntityImplToJson(_$SnakeEntityImpl instance) =>
       'dead': instance.dead,
       'eliminations': instance.eliminations,
       'boostTimer': instance.boostTimer,
+      'previousDropPosition':
+          _$JsonConverterToJson<Map<String, dynamic>, Vector2>(
+              instance.previousDropPosition, const Vector2Converter().toJson),
     };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) =>
+    json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) =>
+    value == null ? null : toJson(value);

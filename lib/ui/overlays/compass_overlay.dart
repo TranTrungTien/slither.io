@@ -34,7 +34,7 @@ class CompassOverlay extends ConsumerWidget {
 
     return Center(
       child: IgnorePointer(
-        child: Container(
+        child: SizedBox(
           width: 300,
           height: 300,
           child: Stack(

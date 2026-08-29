@@ -69,6 +69,20 @@ class SpatialGrid<T> {
     return nearestPoint;
   }
 
+  List<GridPoint<T>> allWithin(Vector2 vector, double range, [bool Function(GridPoint<T>)? predicate]) {
+    final cellsInRange = _getCellsInRange(vector, range);
+    final List<GridPoint<T>> points = [];
+
+    for (final cell in cellsInRange) {
+      for (final point in cell.values) {
+        if (vector.distanceTo(point.position) <= range && (predicate == null || predicate(point))) {
+          points.add(point);
+        }
+      }
+    }
+    return points;
+  }
+
   List<Map<Vector3, GridPoint<T>>> _getCellsInRange(Vector2 vector, double range) {
     final List<Map<Vector3, GridPoint<T>>> cells = [];
     final snapped = _snapToGrid(vector);

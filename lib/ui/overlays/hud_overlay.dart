@@ -16,6 +16,11 @@ class HudOverlay extends ConsumerWidget {
     final snakes = ref.watch(snakeProvider);
     final localSnake = snakes['local_player'];
 
+    // Compute ranking
+    final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
+    final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
+    final rank = rankIndex != -1 ? rankIndex + 1 : null;
+
     final player = ref.watch(playerProvider).value;
 
     return Stack(

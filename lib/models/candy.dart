@@ -11,16 +11,6 @@ enum CandyType {
   dropping,
 }
 
-class ColorConverter implements JsonConverter<Color, int> {
-  const ColorConverter();
-
-  @override
-  Color fromJson(int json) => Color(json);
-
-  @override
-  int toJson(Color object) => object.toARGB32();
-}
-
 @freezed
 class CandyEntity with _$CandyEntity {
   const factory CandyEntity({

@@ -34,7 +34,7 @@ class SnakeEntity with _$SnakeEntity {
     required bool dead,
     required int eliminations,
     @Default(0.0) double boostTimer,
-    @Default(Vector2.zero()) @Vector2Converter() Vector2 previousDropPosition,
+    @Vector2Converter() Vector2? previousDropPosition,
   }) = _SnakeEntity;
 
   factory SnakeEntity.fromJson(Map<String, dynamic> json) => _$SnakeEntityFromJson(json);
@@ -43,13 +43,16 @@ class SnakeEntity with _$SnakeEntity {
 
   SnakeDescription describe() {
     // Ported from: src/shared/store/snakes/snake-utils.ts
-    final radius = math.max(0.7 * (math.log(score / 300.0 + 2.0) / math.ln10), 0.5);
+    // Scaled significantly for "To và Khít" effect
+    final radius = math.max(0.7 * (math.log(score / 300.0 + 2.0) / math.ln10), 0.5) * 60.0;
 
     return SnakeDescription(
       radius: radius,
-      spacingAtHead: math.max(0.75 * radius, 0.5),
-      spacingAtTail: 2.5 * radius,
-      length: 64.0 * (math.log(score / 256.0 + 1.0) / math.ln10) + 3.0,
+      // Spacing rất nhỏ (0.12) để các đốt đè khít lên nhau tạo thân đặc
+      spacingAtHead: 0.12 * radius,
+      spacingAtTail: 0.15 * radius,
+      // Tăng số lượng đốt gấp 6 lần để bù cho việc spacing nhỏ lại
+      length: (64.0 * (math.log(score / 256.0 + 1.0) / math.ln10) + 3.0) * 6.0,
       turnSpeed: (math.max(360.0 - 100.0 * (math.log(score / 150.0 + 1.0) / math.ln10), 45.0) * math.pi / 180.0),
     );
   }

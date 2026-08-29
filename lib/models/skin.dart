@@ -1,6 +1,5 @@
 import 'package:flame/extensions.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'candy.dart'; // For ColorConverter
 import 'vector2_serde.dart';
 
 part 'skin.freezed.dart';

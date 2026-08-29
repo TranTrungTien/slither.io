@@ -1,64 +1,64 @@
-# Implementation Plan - Slither Flutter Rewrite (Phase 1)
+# Implementation Plan - 100% Logic & UI Mapping Fixes
 
-This plan covers the implementation of the core game engine in Flutter using the Flame engine, based on the analyzed TypeScript source.
+Dựa trên kết quả review, kế hoạch này sẽ tinh chỉnh logic core, bổ sung các component UI thiếu sót và cập nhật hệ thống Skin để đạt độ tương đồng tuyệt đối với bản gốc.
 
 ## Goal
-Establish the core "Augmented Experience" of Slither: smooth snake movement, food spawning, and basic collision detection in a single-player environment.
+Fix toàn bộ các sai lệch về logic di chuyển, chết, hiển thị UI và dữ liệu Skin để khớp 100% với `origin_source.md`.
+
+## User Review Required
+> [!IMPORTANT]
+> - **Compass Overlay**: La bàn chỉ hướng Leader sẽ được thêm vào HUD. Tôi sẽ loại bỏ Leaderboard list nếu bạn muốn giống bản gốc hoàn toàn, hoặc giữ cả hai? (Mặc định: Thêm Compass, giữ Leaderboard để tiện theo dõi).
+> - **Scale Vật lý**: Tôi sẽ điều chỉnh `tracerRadius` và khoảng cách rơi candy để đảm bảo mật độ loot giống Roblox nhất có thể.
 
 ## Proposed Changes
 
-### 1. Foundation & Shared Logic
-Grouped by utility and models.
+### 1. Core Logic Fixes
+Khớp chính xác các tham số toán học và xác suất.
 
-#### [NEW] [core_constants.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/core/constants/core_constants.dart)
-Porting missing `core.ts`. Defines `worldBounds`, `tickRate`, `snakeSpeed`, etc.
+#### [MODIFY] [snake_provider.dart](file:///C:/Users/projects/slither.io/lib/providers/snake_provider.dart)
+- Cập nhật logic trừ điểm khi boost: `math.Random().nextInt(maxDecrease) + 1` (để bao gồm giá trị `maxDecrease`).
+- Đảm bảo `tiny` constant và logic `Lerp` khớp hoàn toàn với `snake-slice.ts`.
 
-#### [NEW] [math_utils.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/core/utils/math_utils.dart)
-Porting `shared/utils/math-utils.ts`. Includes `lerpRadians`, `turnRadians`, `mapStrict`.
-
-#### [NEW] [spatial_grid.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/core/utils/spatial_grid.dart)
-Porting `shared/utils/grid.ts`. Efficient spatial partitioning for collisions.
-
----
-
-### 2. State Management (Riverpod)
-Porting the Redux-like logic to Riverpod.
-
-#### [NEW] [snake_state.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/core/state/snake_state.dart)
-Porting `shared/store/snakes/`. `SnakeEntity` model and `SnakeNotifier`.
-
-#### [NEW] [candy_state.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/core/state/candy_state.dart)
-Porting `shared/store/candy/`. `CandyEntity` model and `CandyNotifier`.
+#### [MODIFY] [slither_game.dart](file:///C:/Users/projects/slither.io/lib/game/slither_game.dart)
+- Cập nhật `_handleSnakeDeath`:
+    - Fix scale `tracerRadius` khi tính toán vị trí rơi candy.
+    - Đảm bảo logic spawn candy trên mỗi tracer khớp với vòng lặp `for (const tracer of tracers)` trong bản gốc.
 
 ---
 
-### 3. Flame Engine Integration
-Visualizing the state.
+### 2. UI & UX Enhancements
+Bổ sung các thành phần thị giác đặc trưng.
 
-#### [NEW] [slither_game.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/game/slither_game.dart)
-Main `FlameGame` class. Manages the loop and integrates with Riverpod.
+#### [MODIFY] [minimap_overlay.dart](file:///C:/Users/projects/slither.io/lib/ui/overlays/minimap_overlay.dart)
+- Thêm tâm ngắm `map_crosshair` vào giữa bản đồ.
+- Cập nhật `BoxDecoration`: Thêm `border` màu `lavender` với độ trong suốt 0.1 và `uigradient` (mô phỏng bằng `LinearGradient` từ `crust` đến `mantle`).
 
-#### [NEW] [snake_component.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/game/components/snake_component.dart)
-Renders the head and body segments.
+#### [NEW] [compass_overlay.dart](file:///C:/Users/projects/slither.io/lib/ui/overlays/compass_overlay.dart)
+- Implement la bàn chỉ hướng Leader (`src/client/components/game/compass/`).
+- Hiển thị emoji 👑 và mũi tên `leader_pointer` xoay theo hướng Leader hiện tại.
 
-#### [NEW] [candy_component.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/game/components/candy_component.dart)
-Renders food items.
+#### [MODIFY] [hud_overlay.dart](file:///C:/Users/projects/slither.io/lib/ui/overlays/hud_overlay.dart)
+- Thêm `StatsCard` cho **Cash** (sử dụng màu xanh lá cây đặc trưng).
+- Tích hợp la bàn vào Stack HUD.
 
 ---
 
-### 4. Game Systems
-#### [NEW] [collision_system.dart](file:///C:/Users/Administrator/StudioProjects/slither_io/lib/game/systems/collision_system.dart)
-Porting `onCollisionTick` logic.
+### 3. Data & Skins Mapping
+Cập nhật hệ thống skin phức tạp.
+
+#### [MODIFY] [skin_presets.dart](file:///C:/Users/projects/slither.io/lib/models/skin_presets.dart)
+- Implement `_blendColorSequence`: Tạo mảng 12 màu cho mỗi skin Catppuccin (từ `color` đến `color.lerp(black, 0.1)`).
+- Bổ sung các skin quốc kỳ và đặc biệt: `usa`, `canada`, `uk`, `france`, `silver`.
+
+#### [MODIFY] [constants.dart](file:///C:/Users/projects/slither.io/lib/utils/constants.dart)
+- Thêm các đường dẫn asset cho Compass và Minimap crosshair.
 
 ## Verification Plan
 
 ### Automated Tests
-- Unit tests for `turnRadians` to ensure smooth rotation.
-- Unit tests for `SpatialGrid` insertion and nearest-neighbor query.
+- Chạy lại các unit test liên quan đến `SnakeNotifier` để đảm bảo logic drain/growth không bị sai lệch sau khi sửa.
 
 ### Manual Verification
-- Run the app and verify:
-  - Snake follows the pointer (mouse/touch).
-  - Snake grows when eating candy.
-  - Snake dies when hitting world boundaries.
-  - Performance stays stable with 1000+ candy items.
+- **Visual Check**: So sánh Minimap mới với screenshot bản gốc (crosshair, border).
+- **Behavior Check**: Boost và kiểm tra xem điểm trừ có khớp dải `[1, maxDecrease]` không.
+- **Leader Tracking**: Di chuyển xa leader và kiểm tra xem Compass có chỉ đúng hướng không.

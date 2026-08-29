@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/alert_provider.dart';
 import '../../models/alert.dart';
-import '../../utils/constants.dart';
 
 class AlertsOverlay extends ConsumerWidget {
   const AlertsOverlay({super.key});
