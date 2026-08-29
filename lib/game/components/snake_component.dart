@@ -30,9 +30,13 @@ class SnakeComponent extends Component {
     // 1. Draw body tracers
     for (int i = entity.tracers.length - 1; i >= 0; i--) {
       final pos = entity.tracers[i];
-      // Alternating tints if skin has them
-      if (skin.tint.length > 1) {
-        bodyPaint.color = skin.tint[i % skin.tint.length];
+
+      final List<Color> tints = (entity.isBoosting && skin.boostTint != null)
+          ? skin.boostTint!
+          : skin.tint;
+
+      if (tints.isNotEmpty) {
+        bodyPaint.color = tints[i % tints.length];
       }
 
       canvas.drawCircle(pos.toOffset(), radius, bodyPaint);

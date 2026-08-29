@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/snake_provider.dart';
+import '../../providers/player_provider.dart';
 import '../../utils/constants.dart';
 import '../../models/snake.dart';
+import 'compass_overlay.dart';
 
 // Ported from: src/client/components/stats/stats.tsx
 
@@ -14,13 +16,12 @@ class HudOverlay extends ConsumerWidget {
     final snakes = ref.watch(snakeProvider);
     final localSnake = snakes['local_player'];
 
-    // Compute ranking
-    final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
-    final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
-    final rank = rankIndex != -1 ? rankIndex + 1 : null;
+    final player = ref.watch(playerProvider).value;
 
     return Stack(
       children: [
+        const CompassOverlay(),
+
         // Bottom Left: Stats
         Positioned(
           bottom: 20,
@@ -51,6 +52,14 @@ class HudOverlay extends ConsumerWidget {
                 primary: const Color(0xFFB54040),
                 secondary: const Color(0xFF963B54),
               ),
+              const SizedBox(height: 8),
+              _StatsCard(
+                emoji: '💵',
+                label: 'Cash',
+                value: '\$${player?.balance ?? 0}',
+                primary: const Color(0xFF6F9E4F),
+                secondary: const Color(0xFF99B56B),
+              ),
             ],
           ),
         ),
@@ -66,8 +75,14 @@ class HudOverlay extends ConsumerWidget {
   }
 
   String _formatRank(int rank) {
-    if (rank >= 11 && rank <= 13) return '${rank}th';
-    switch (rank % 10) {
+    final lastDigit = rank % 10;
+    final lastTwoDigits = rank % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+      return '${rank}th';
+    }
+
+    switch (lastDigit) {
       case 1: return '${rank}st';
       case 2: return '${rank}nd';
       case 3: return '${rank}rd';

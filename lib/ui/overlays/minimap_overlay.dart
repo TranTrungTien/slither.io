@@ -21,15 +21,30 @@ class MinimapOverlay extends ConsumerWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: CatppuccinColors.crust.withAlpha(150),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white10, width: 2),
-        ),
-        child: CustomPaint(
-          painter: _MinimapPainter(
-            snakes: snakes.values.toList(),
-            worldBounds: GameConstants.worldBounds,
+          gradient: const LinearGradient(
+            colors: [CatppuccinColors.crust, CatppuccinColors.mantle],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          shape: BoxShape.circle,
+          border: Border.all(color: CatppuccinColors.lavender.withAlpha(50), width: 2),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: Opacity(
+                opacity: 0.5,
+                child: Image.asset(SlitherAssets.mapCrosshair, width: 20, height: 20),
+              ),
+            ),
+            CustomPaint(
+              size: const Size(size, size),
+              painter: _MinimapPainter(
+                snakes: snakes.values.toList(),
+                worldBounds: GameConstants.worldBounds,
+              ),
+            ),
+          ],
         ),
       ),
     );

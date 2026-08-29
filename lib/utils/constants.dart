@@ -28,6 +28,10 @@ class CatppuccinColors {
   static const Color base = Color(0xFF1E1E2E);
   static const Color mantle = Color(0xFF181825);
   static const Color crust = Color(0xFF11111B);
+
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color offwhite = Color(0xFFEAEEFD);
+  static const Color black = Color(0xFF000000);
 }
 
 class GameConstants {
@@ -48,4 +52,14 @@ class GameConstants {
     'dropping': 256,
     'loot': 256,
   };
+}
+
+class SlitherAssets {
+  static const String mapCrosshair = 'assets/images/ui/map_crosshair.png';
+  static const String mapCursor = 'assets/images/ui/map_cursor.png';
+  static const String leaderPointer = 'assets/images/ui/leader_pointer.png';
+  static const String snakeEyeLeft = 'assets/images/skins/snake_eye_left.png';
+  static const String snakeEyeRight = 'assets/images/skins/snake_eye_right.png';
+  static const String heart = 'assets/images/ui/heart.png';
+  static const String heartGlow = 'assets/images/ui/heart_glow.png';
 }

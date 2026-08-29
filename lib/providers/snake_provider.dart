@@ -69,7 +69,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
 
   void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
     final newState = <String, SnakeEntity>{};
-    const double tiny = 0.0001;
+    const double TINY = 0.0001;
 
     state.forEach((id, snake) {
       if (snake.dead) {
@@ -86,7 +86,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
         if (currentBoostTimer >= 0.15) {
           currentBoostTimer = 0.0;
           final int maxDecrease = (3 + 0.001 * currentScore).round().clamp(2, 10);
-          final int drain = math.Random().nextInt(maxDecrease - 1) + 1;
+          final int drain = math.Random().nextInt(maxDecrease) + 1;
           currentScore = math.max(0, currentScore - drain);
 
           final description = snake.copyWith(score: currentScore).describe();
@@ -129,10 +129,10 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
             description.spacingAtTail,
           );
 
-          final double alpha = ((dt * speed) / spacing).clamp(tiny, 1.0 - tiny);
+          final double alpha = ((dt * speed) / spacing).clamp(TINY, 1.0 - TINY);
 
           if (i == desiredLength - 1) {
-            final double stretch = math.max(description.length % 1, tiny);
+            final double stretch = math.max(description.length % 1, TINY);
             final Vector2 lerped = tracer.clone()..lerp(previous, alpha);
             tailVar = tailVar.clone()..lerp(lerped, stretch);
           } else {
@@ -144,7 +144,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
 
       if (currentLength < desiredLength) {
         for (int i = currentLength; i < desiredLength; i++) {
-          final Vector2 newTracer = tailVar + Vector2(tiny * (i + 1), 0);
+          final Vector2 newTracer = tailVar + Vector2(TINY * (i + 1), 0);
           nextTracers.add(newTracer);
         }
       }

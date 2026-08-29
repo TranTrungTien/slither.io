@@ -147,13 +147,36 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       final rank = rankIndex != -1 ? rankIndex + 1 : null;
 
       if (rank != null && _lastRank != null && rank < _lastRank!) {
-         ref.read(alertProvider.notifier).sendAlert(
-           emoji: '📈',
-           message: 'RANK UP: #$rank',
-           color: CatppuccinColors.blue,
-           scope: AlertScope.ranking,
-         );
-         AudioService.play(SlitherSound.alertNeutral);
+        if (rank == 1) {
+          ref.read(alertProvider.notifier).sendAlert(
+            emoji: '🏆',
+            message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
+            color: CatppuccinColors.yellow,
+            scope: AlertScope.ranking,
+          );
+        } else if (rank == 2) {
+          ref.read(alertProvider.notifier).sendAlert(
+            emoji: '🥈',
+            message: 'CONGRATULATIONS! YOU ARE IN SECOND PLACE',
+            color: CatppuccinColors.sapphire,
+            scope: AlertScope.ranking,
+          );
+        } else if (rank == 3) {
+          ref.read(alertProvider.notifier).sendAlert(
+            emoji: '🥉',
+            message: 'CONGRATULATIONS! YOU ARE IN THIRD PLACE',
+            color: CatppuccinColors.maroon,
+            scope: AlertScope.ranking,
+          );
+        } else {
+          ref.read(alertProvider.notifier).sendAlert(
+            emoji: '📈',
+            message: 'RANK UP: #$rank',
+            color: CatppuccinColors.blue,
+            scope: AlertScope.ranking,
+          );
+        }
+        AudioService.play(SlitherSound.alertNeutral);
       }
       _lastRank = rank;
     }
@@ -174,21 +197,21 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
 
     final tracers = [...snake.tracers, snake.head];
     final description = snake.describe();
-    final tracerRadius = description.radius * 10.0;
+    final tracerRadius = description.radius; // Scaled by 10 for world units
 
     final List<Vector2> candyPositions = [];
     Vector2? lastTracer;
 
     for (final tracer in tracers) {
-      if (lastTracer != null && tracer.distanceTo(lastTracer) < 0.25 * tracerRadius) {
+      if (lastTracer != null && tracer.distanceTo(lastTracer) < 0.25 * tracerRadius * 10.0) {
         continue;
       }
       lastTracer = tracer;
 
-      final int amount = (random.nextDouble() * math.max(tracerRadius / 5.0, 1.0)).round() + 1;
+      final int amount = (random.nextDouble() * math.max((tracerRadius * 10.0) / 5.0, 1.0)).round() + 1;
       for (int i = 0; i < amount; i++) {
-        final x = (random.nextDouble() * 2 - 1) * tracerRadius;
-        final y = (random.nextDouble() * 2 - 1) * tracerRadius;
+        final x = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
+        final y = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
         candyPositions.add(tracer + Vector2(x, y));
       }
     }
