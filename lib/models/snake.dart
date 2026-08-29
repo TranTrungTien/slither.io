@@ -41,6 +41,9 @@ class SnakeEntity with _$SnakeEntity {
 
   bool get isBoosting => boost && score > 10;
 
+  SnakeDescription? _cachedDescription;
+  int? _cachedScore;
+
   void updateInPlace({
     Vector2? newHead,
     double? newAngle,
@@ -65,6 +68,8 @@ class SnakeEntity with _$SnakeEntity {
     }
     if (newScore != null) {
       score = newScore;
+      _cachedScore = null;
+      _cachedDescription = null;
     }
     if (newBoost != null) {
       boost = newBoost;
@@ -92,18 +97,19 @@ class SnakeEntity with _$SnakeEntity {
   }
 
   SnakeDescription describe() {
-    // Ported from: src/shared/store/snakes/snake-utils.ts
-    // Scaled significantly for "To và Khít" effect
-    final radius = math.max(0.7 * (math.log(score / 300.0 + 2.0) / math.ln10), 0.5) * 60.0;
+    if (_cachedDescription != null && _cachedScore == score) {
+      return _cachedDescription!;
+    }
 
-    return SnakeDescription(
+    final radius = math.max(0.7 * (math.log(score / 300.0 + 2.0) / math.ln10), 0.5) * 60.0;
+    _cachedDescription = SnakeDescription(
       radius: radius,
-      // Spacing rất nhỏ (0.12) để các đốt đè khít lên nhau tạo thân đặc
       spacingAtHead: 0.12 * radius,
       spacingAtTail: 0.15 * radius,
-      // Tăng số lượng đốt gấp 6 lần để bù cho việc spacing nhỏ lại
       length: (64.0 * (math.log(score / 256.0 + 1.0) / math.ln10) + 3.0) * 6.0,
       turnSpeed: (math.max(360.0 - 100.0 * (math.log(score / 150.0 + 1.0) / math.ln10), 45.0) * math.pi / 180.0),
     );
+    _cachedScore = score;
+    return _cachedDescription!;
   }
 }

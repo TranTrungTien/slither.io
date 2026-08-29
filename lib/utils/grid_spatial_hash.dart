@@ -15,16 +15,18 @@ class SpatialGrid<T> {
 
   SpatialGrid(this.resolution);
 
+  int _cellKeyXY(int x, int y) => (x << 20) ^ (y & 0xFFFFF);
+
   int _cellKey(Vector2 value) {
     final x = (value.x / resolution).floor();
     final y = (value.y / resolution).floor();
-    return (x << 20) ^ (y & 0xFFFFF);
+    return _cellKeyXY(x, y);
   }
 
   int _pointKey(Vector2 value) {
     final x = (value.x * 100).round();
     final y = (value.y * 100).round();
-    return (x << 20) ^ (y & 0xFFFFF);
+    return _cellKeyXY(x, y);
   }
 
   Vector2 _snapToGrid(Vector2 value) {
@@ -92,10 +94,12 @@ class SpatialGrid<T> {
     final List<Map<int, GridPoint<T>>> cells = [];
     final snapped = _snapToGrid(vector);
     final intRange = (range / resolution).ceil();
+    final int snappedX = snapped.x.toInt();
+    final int snappedY = snapped.y.toInt();
 
     for (int i = -intRange; i <= intRange; i++) {
       for (int j = -intRange; j <= intRange; j++) {
-        final cellKey = _cellKey(Vector2(snapped.x + i, snapped.y + j));
+        final cellKey = _cellKeyXY(snappedX + i, snappedY + j);
         final cell = _cells[cellKey];
         if (cell != null) {
           cells.add(cell);

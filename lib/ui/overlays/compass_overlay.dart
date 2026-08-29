@@ -10,7 +10,7 @@ class CompassOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final snakes = ref.watch(snakeProvider);
+    final snakes = ref.watch(snakeProvider).snakes;
     final localSnake = snakes['local_player'];
 
     if (localSnake == null || localSnake.dead) return const SizedBox.shrink();

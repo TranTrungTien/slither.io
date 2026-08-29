@@ -80,7 +80,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     if (dt <= 0) return;
     super.update(dt);
 
-    final snakes = ref.read(snakeProvider);
+    final snakes = ref.read(snakeProvider).snakes;
     final candies = ref.read(candyProvider);
 
     _maintainBots(snakes);
@@ -111,7 +111,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       ));
     });
 
-    final updatedSnakes = ref.read(snakeProvider);
+    final updatedSnakes = ref.read(snakeProvider).snakes;
     final updatedCandies = ref.read(candyProvider);
 
     _collisionSystem.checkCollisions(
@@ -147,7 +147,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       _syncComponents();
     }
 
-    final localSnake = ref.read(snakeProvider)['local_player'];
+    final localSnake = ref.read(snakeProvider).snakes['local_player'];
     if (localSnake != null && !localSnake.dead) {
       camera.viewfinder.position = localSnake.head;
 
@@ -200,7 +200,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void _handleSnakeDeath(String snakeId) {
-    final snakes = ref.read(snakeProvider);
+    final snakes = ref.read(snakeProvider).snakes;
     final snake = snakes[snakeId];
     if (snake == null || snake.dead) return;
 
@@ -212,12 +212,12 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     final random = math.Random();
     final List<CandyEntity> loot = [];
 
-    final tracers = [...snake.tracers, snake.head];
     final description = snake.describe();
-    final tracerRadius = description.radius; // Scaled by 10 for world units
+    final tracerRadius = description.radius;
 
     final List<Vector2> candyPositions = [];
     Vector2? lastTracer;
+    final tracers = snake.tracers;
 
     for (final tracer in tracers) {
       if (lastTracer != null && tracer.distanceTo(lastTracer) < 0.25 * tracerRadius * 10.0) {
@@ -233,12 +233,22 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       }
     }
 
+    if (lastTracer != null) {
+      final headAmount = (random.nextDouble() * math.max((tracerRadius * 10.0) / 5.0, 1.0)).round() + 1;
+      for (int i = 0; i < headAmount; i++) {
+        final x = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
+        final y = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
+        candyPositions.add(snake.head + Vector2(x, y));
+      }
+    }
+
     final double sum = math.min(8000 * (math.log(snake.score / 3000.0 + 1.0) / math.ln10), snake.score.toDouble());
     final int total = candyPositions.length;
     final int sizePerCandy = (total > 0) ? (sum / total).ceil().clamp(1, 100) : 1;
 
     final skin = SkinPresets.getById(snake.skin);
 
+    final timestamp = DateTime.now().microsecondsSinceEpoch;
     for (int i = 0; i < candyPositions.length; i++) {
       final pos = candyPositions[i];
       Color color = skin.primary ?? CatppuccinColors.peach;
@@ -247,7 +257,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       }
 
       loot.add(CandyEntity(
-        id: 'loot_${DateTime.now().microsecondsSinceEpoch}_${pos.x}_$i',
+        id: 'loot_${timestamp}_$i',
         size: sizePerCandy,
         position: pos,
         color: color,
@@ -260,7 +270,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void _syncComponents() {
-    final snakes = ref.read(snakeProvider);
+    final snakes = ref.read(snakeProvider).snakes;
     final candies = ref.read(candyProvider);
 
     // 1. Sync Snakes
@@ -317,7 +327,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     if (event is KeyRepeatEvent) return KeyEventResult.ignored;
 
     final isSpace = keysPressed.contains(LogicalKeyboardKey.space);
-    final localSnake = ref.read(snakeProvider)['local_player'];
+    final localSnake = ref.read(snakeProvider).snakes['local_player'];
 
     if (localSnake != null && localSnake.boost != isSpace) {
       if (isSpace && localSnake.score > 10) {
@@ -342,7 +352,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void _handleInput(Vector2 screenPos) {
-    final localSnake = ref.read(snakeProvider)['local_player'];
+    final localSnake = ref.read(snakeProvider).snakes['local_player'];
     if (localSnake == null || localSnake.dead) return;
 
     final size = canvasSize;

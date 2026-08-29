@@ -27,7 +27,7 @@ class GameScreen extends ConsumerWidget {
               'minimap': (context, game) => const MinimapOverlay(),
               'alerts': (context, game) => const AlertsOverlay(),
               'death': (context, game) {
-                final score = ref.read(snakeProvider)['local_player']?.score ?? 0;
+                final score = ref.read(snakeProvider).snakes['local_player']?.score ?? 0;
                 return DeathOverlay(
                   finalScore: score,
                   onRestart: () {

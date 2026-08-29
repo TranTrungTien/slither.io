@@ -11,12 +11,13 @@ class CollisionSystem {
 
   void updateGrids(Map<String, SnakeEntity> snakes, Map<String, CandyEntity> candies) {
     snakeGrid.clear();
+    const int tracerStep = 3;
     for (final snake in snakes.values) {
       if (snake.dead) continue;
 
       snakeGrid.insert(snake.head, snake.id);
-      for (final tracer in snake.tracers) {
-        snakeGrid.insert(tracer, snake.id);
+      for (int i = 0; i < snake.tracers.length; i += tracerStep) {
+        snakeGrid.insert(snake.tracers[i], snake.id);
       }
     }
 

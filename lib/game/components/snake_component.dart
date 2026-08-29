@@ -38,7 +38,6 @@ class SnakeComponent extends Component {
     final description = entity.describe();
     final radius = description.radius;
     final skin = SkinPresets.getById(entity.skin);
-    final tintList = (entity.isBoosting && skin.boostTint != null) ? skin.boostTint! : skin.tint;
 
     _bodyPaint.color = skin.primary ?? CatppuccinColors.mauve;
     _bodyPaint.strokeWidth = radius * 2.0;
@@ -50,9 +49,6 @@ class SnakeComponent extends Component {
     for (int i = entity.tracers.length - 1; i >= 0; i -= renderStep) {
       if (_pointCount >= 1024) break;
       final pos = entity.tracers[i];
-      if (tintList.isNotEmpty) {
-       _bodyPaint.color = tintList[i % tintList.length];
-      }
       _pointBuffer[_pointCount * 2] = pos.x;
       _pointBuffer[_pointCount * 2 + 1] = pos.y;
       _pointCount++;

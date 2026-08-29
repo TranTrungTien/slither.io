@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flame/extensions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/snake.dart';
 import '../utils/constants.dart';
@@ -7,8 +8,10 @@ import '../utils/math_utils.dart';
 
 // Ported from: src/shared/store/snakes/snake-slice.ts
 
-class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
-  SnakeNotifier() : super({});
+class SnakeNotifier extends ChangeNotifier {
+  Map<String, SnakeEntity> _snakes = {};
+
+  Map<String, SnakeEntity> get snakes => _snakes;
 
   void addSnake(String id, {String? name, Vector2? head, String? skin, int? score}) {
     final headPos = head ?? Vector2.zero();
@@ -27,52 +30,54 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
       previousDropPosition: headPos,
     );
 
-    state = {
-      ...state,
-      id: newSnake,
-    };
+    _snakes = {..._snakes, id: newSnake};
+    notifyListeners();
   }
 
   void turnSnake(String id, double desiredAngle) {
-    final snake = state[id];
+    final snake = _snakes[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(desiredAngle: desiredAngle)};
+    snake.desiredAngle = desiredAngle;
+    notifyListeners();
   }
 
   void boostSnake(String id, bool boost) {
-    final snake = state[id];
+    final snake = _snakes[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(boost: boost)};
+    snake.boost = boost;
+    notifyListeners();
   }
 
   void killSnake(String id) {
-    final snake = state[id];
+    final snake = _snakes[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(dead: true)};
+    snake.dead = true;
+    notifyListeners();
   }
 
   void removeSnake(String id) {
-    final newState = Map<String, SnakeEntity>.from(state);
-    newState.remove(id);
-    state = newState;
+    _snakes.remove(id);
+    notifyListeners();
   }
 
   void incrementScore(String id, int amount) {
-    final snake = state[id];
+    final snake = _snakes[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(score: math.max(0, snake.score + amount))};
+    snake.score = math.max(0, snake.score + amount);
+    notifyListeners();
   }
 
   void incrementEliminations(String id) {
-    final snake = state[id];
+    final snake = _snakes[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(eliminations: snake.eliminations + 1)};
+    snake.eliminations += 1;
+    notifyListeners();
   }
 
   void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
     const double tiny = 0.0001;
 
-    for (final entry in state.entries) {
+    for (final entry in _snakes.entries) {
       final snake = entry.value;
       if (snake.dead) continue;
 
@@ -88,7 +93,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
           final int drain = math.Random().nextInt(maxDecrease) + 1;
           currentScore = math.max(0, currentScore - drain);
 
-          final description = snake.copyWith(score: currentScore).describe();
+          final description = snake.describe();
           final tail = snake.tracers.isNotEmpty ? snake.tracers.last : null;
 
           if (tail != null && onBoostDrop != null) {
@@ -102,7 +107,7 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
         currentBoostTimer = 0.0;
       }
 
-      final description = snake.copyWith(score: currentScore).describe();
+      final description = snake.describe();
       final speed = snake.isBoosting ? GameConstants.snakeBoostSpeed : GameConstants.snakeSpeed;
       final angle = turnRadians(snake.angle, snake.desiredAngle, description.turnSpeed * dt);
       final direction = Vector2(math.cos(angle), math.sin(angle));
@@ -156,10 +161,10 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
       }
     }
 
-    state = {...state};
+    notifyListeners();
   }
 }
 
-final snakeProvider = StateNotifierProvider<SnakeNotifier, Map<String, SnakeEntity>>((ref) {
+final snakeProvider = ChangeNotifierProvider<SnakeNotifier>((ref) {
   return SnakeNotifier();
 });
