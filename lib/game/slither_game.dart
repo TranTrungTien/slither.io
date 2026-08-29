@@ -30,6 +30,8 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
 
   static const int minSnakes = 20;
   int? _lastRank;
+  double _rankTimer = 0.0;
+  double _syncTimer = 0.0;
 
   SlitherGame(this.ref);
 
@@ -100,13 +102,13 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     }
 
     ref.read(snakeProvider.notifier).updateTick(dt, onBoostDrop: (pos, amount) {
-       ref.read(candyProvider.notifier).addCandy(CandyEntity(
-         id: 'drop_${DateTime.now().microsecondsSinceEpoch}_${pos.x}',
-         size: amount,
-         position: pos,
-         color: CatppuccinColors.surface2,
-         type: CandyType.dropping,
-       ));
+      ref.read(candyProvider.notifier).addCandy(CandyEntity(
+       id: 'drop_${DateTime.now().microsecondsSinceEpoch}_${pos.x}',
+       size: amount,
+       position: pos,
+       color: CatppuccinColors.surface2,
+       type: CandyType.dropping,
+      ));
     });
 
     final updatedSnakes = ref.read(snakeProvider);
@@ -128,66 +130,72 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       onSnakeCollision: (victimId, killerId) {
         ref.read(snakeProvider.notifier).incrementEliminations(killerId);
         if (killerId == 'local_player') {
-           ref.read(alertProvider.notifier).sendAlert(
-             emoji: '🔥',
-             message: 'ELIMINATED BOT',
-             color: CatppuccinColors.red,
-           );
-           AudioService.play(SlitherSound.alertMoney);
+         ref.read(alertProvider.notifier).sendAlert(
+           emoji: '🔥',
+           message: 'ELIMINATED BOT',
+           color: CatppuccinColors.red,
+         );
+         AudioService.play(SlitherSound.alertMoney);
         }
         _handleSnakeDeath(victimId);
       },
     );
 
-    _syncComponents();
+    _syncTimer += dt;
+    if (_syncTimer >= GameConstants.worldTick) {
+      _syncTimer = 0.0;
+      _syncComponents();
+    }
 
     final localSnake = ref.read(snakeProvider)['local_player'];
     if (localSnake != null && !localSnake.dead) {
       camera.viewfinder.position = localSnake.head;
 
       final description = localSnake.describe();
-      // Adjust zoom logic for larger snakes
       final double targetZoom = 1.2 / (description.radius * 0.05 + 1.0);
       camera.viewfinder.zoom = targetZoom;
 
-      // Rank alert
-      final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
-      final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
-      final rank = rankIndex != -1 ? rankIndex + 1 : null;
+      _rankTimer += dt;
+      if (_rankTimer >= 0.5) {
+       _rankTimer = 0.0;
+       final sortedSnakes = updatedSnakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
+       final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
+       final rank = rankIndex != -1 ? rankIndex + 1 : null;
 
-      if (rank != null && _lastRank != null && rank < _lastRank!) {
-        if (rank == 1) {
-          ref.read(alertProvider.notifier).sendAlert(
-            emoji: '🏆',
-            message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
-            color: CatppuccinColors.yellow,
-            scope: AlertScope.ranking,
-          );
-        } else if (rank == 2) {
-          ref.read(alertProvider.notifier).sendAlert(
-            emoji: '🥈',
-            message: 'CONGRATULATIONS! YOU ARE IN SECOND PLACE',
-            color: CatppuccinColors.sapphire,
-            scope: AlertScope.ranking,
-          );
-        } else if (rank == 3) {
-          ref.read(alertProvider.notifier).sendAlert(
-            emoji: '🥉',
-            message: 'CONGRATULATIONS! YOU ARE IN THIRD PLACE',
-            color: CatppuccinColors.maroon,
-            scope: AlertScope.ranking,
-          );
-        } else {
-          ref.read(alertProvider.notifier).sendAlert(
-            emoji: '📈',
-            message: 'RANK UP: #$rank',
-            color: CatppuccinColors.blue,
-            scope: AlertScope.ranking,
-          );
-        }
-        AudioService.play(SlitherSound.alertNeutral);
+       if (rank != null && _lastRank != null && rank < _lastRank!) {
+         if (rank == 1) {
+           ref.read(alertProvider.notifier).sendAlert(
+             emoji: '🏆',
+             message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
+             color: CatppuccinColors.yellow,
+             scope: AlertScope.ranking,
+           );
+         } else if (rank == 2) {
+           ref.read(alertProvider.notifier).sendAlert(
+             emoji: '🥈',
+             message: 'CONGRATULATIONS! YOU ARE IN SECOND PLACE',
+             color: CatppuccinColors.sapphire,
+             scope: AlertScope.ranking,
+           );
+         } else if (rank == 3) {
+           ref.read(alertProvider.notifier).sendAlert(
+             emoji: '🥉',
+             message: 'CONGRATULATIONS! YOU ARE IN THIRD PLACE',
+             color: CatppuccinColors.maroon,
+             scope: AlertScope.ranking,
+           );
+         } else {
+           ref.read(alertProvider.notifier).sendAlert(
+             emoji: '📈',
+             message: 'RANK UP: #$rank',
+             color: CatppuccinColors.blue,
+             scope: AlertScope.ranking,
+           );
+         }
+         AudioService.play(SlitherSound.alertNeutral);
+       }
+       _lastRank = rank;
       }
-      _lastRank = rank;
     }
   }
 

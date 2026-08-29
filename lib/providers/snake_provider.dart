@@ -70,14 +70,11 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
   }
 
   void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
-    final newState = <String, SnakeEntity>{};
     const double tiny = 0.0001;
 
-    state.forEach((id, snake) {
-      if (snake.dead) {
-        newState[id] = snake;
-        return;
-      }
+    for (final entry in state.entries) {
+      final snake = entry.value;
+      if (snake.dead) continue;
 
       double currentBoostTimer = snake.boostTimer;
       int currentScore = snake.score;
@@ -107,61 +104,59 @@ class SnakeNotifier extends StateNotifier<Map<String, SnakeEntity>> {
 
       final description = snake.copyWith(score: currentScore).describe();
       final speed = snake.isBoosting ? GameConstants.snakeBoostSpeed : GameConstants.snakeSpeed;
-
       final angle = turnRadians(snake.angle, snake.desiredAngle, description.turnSpeed * dt);
       final direction = Vector2(math.cos(angle), math.sin(angle));
-      final head = snake.head + (direction * (speed * dt));
+      final nextHead = snake.head + (direction * (speed * dt));
 
-      final int currentLength = snake.tracers.length;
+      snake.head.setFrom(nextHead);
+      snake.angle = angle;
+      snake.score = currentScore;
+      snake.boostTimer = currentBoostTimer;
+      snake.previousDropPosition = previousDropPosition;
+
+      final tracers = snake.tracers;
+      final int currentLength = tracers.length;
       final int desiredLength = description.length.floor();
-      Vector2 tailVar = head.clone();
+      final Vector2 temp = Vector2.zero();
+      final Vector2 tailVar = Vector2.zero();
 
-      final List<Vector2> nextTracers = [];
+      while (tracers.length > desiredLength) {
+        tracers.removeLast();
+      }
+      while (tracers.length < desiredLength) {
+        tracers.add(Vector2.zero());
+      }
 
       for (int i = 0; i < desiredLength; i++) {
-        if (i < currentLength) {
-          final Vector2 tracer = snake.tracers[i];
-          final Vector2 previous = i == 0 ? snake.head : snake.tracers[i - 1];
+        final Vector2 tracer = tracers[i];
+        final Vector2 previous = i == 0 ? snake.head : tracers[i - 1];
 
-          final double spacing = map(
-            i.toDouble(),
-            0,
-            math.max(1.0, currentLength.toDouble()),
-            description.spacingAtHead,
-            description.spacingAtTail,
-          );
+        final double spacing = map(
+          i.toDouble(),
+          0,
+          math.max(1.0, currentLength.toDouble()),
+          description.spacingAtHead,
+          description.spacingAtTail,
+        );
 
-          final double alpha = ((dt * speed) / spacing).clamp(tiny, 1.0 - tiny);
+        final double alpha = ((dt * speed) / spacing).clamp(tiny, 1.0 - tiny);
 
-          if (i == desiredLength - 1) {
-            final double stretch = math.max(description.length % 1, tiny);
-            final Vector2 lerped = tracer.clone()..lerp(previous, alpha);
-            tailVar = tailVar.clone()..lerp(lerped, stretch);
-          } else {
-            tailVar = tracer.clone()..lerp(previous, alpha);
-          }
-          nextTracers.add(tailVar.clone());
+        if (i == desiredLength - 1) {
+          final double stretch = math.max(description.length % 1, tiny);
+          temp.setFrom(tracer);
+          temp.lerp(previous, alpha);
+          tailVar.setFrom(temp);
+          tailVar.lerp(previous, stretch);
+          tracer.setFrom(tailVar);
+        } else {
+          temp.setFrom(tracer);
+          temp.lerp(previous, alpha);
+          tracer.setFrom(temp);
         }
       }
+    }
 
-      if (currentLength < desiredLength) {
-        for (int i = currentLength; i < desiredLength; i++) {
-          final Vector2 newTracer = tailVar + Vector2(tiny * (i + 1), 0);
-          nextTracers.add(newTracer);
-        }
-      }
-
-      newState[id] = snake.copyWith(
-        head: head,
-        angle: angle,
-        score: currentScore,
-        boostTimer: currentBoostTimer,
-        previousDropPosition: previousDropPosition,
-        tracers: nextTracers,
-      );
-    });
-
-    state = newState;
+    state = {...state};
   }
 }
 

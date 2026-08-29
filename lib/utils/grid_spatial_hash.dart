@@ -10,18 +10,21 @@ class GridPoint<T> {
 }
 
 class SpatialGrid<T> {
-  final Map<Vector3, Map<Vector3, GridPoint<T>>> _cells = {};
+  final Map<int, Map<int, GridPoint<T>>> _cells = {};
   final double resolution;
 
   SpatialGrid(this.resolution);
 
-  Vector3 _vectorize(Vector2 v) {
-    // Round to prevent tiny float precision issues from creating separate keys
-    return Vector3(
-      (v.x * 100).roundToDouble() / 100.0,
-      (v.y * 100).roundToDouble() / 100.0,
-      0,
-    );
+  int _cellKey(Vector2 value) {
+    final x = (value.x / resolution).floor();
+    final y = (value.y / resolution).floor();
+    return (x << 20) ^ (y & 0xFFFFF);
+  }
+
+  int _pointKey(Vector2 value) {
+    final x = (value.x * 100).round();
+    final y = (value.y * 100).round();
+    return (x << 20) ^ (y & 0xFFFFF);
   }
 
   Vector2 _snapToGrid(Vector2 value) {
@@ -32,19 +35,21 @@ class SpatialGrid<T> {
   }
 
   void insert(Vector2 vector, T metadata) {
-    final key = _vectorize(_snapToGrid(vector));
-    final cell = _cells.putIfAbsent(key, () => {});
-    cell[_vectorize(vector)] = GridPoint(position: vector, metadata: metadata);
+    final cellKey = _cellKey(vector);
+    final pointKey = _pointKey(vector);
+    final cell = _cells.putIfAbsent(cellKey, () => {});
+    cell[pointKey] = GridPoint(position: vector, metadata: metadata);
   }
 
   void remove(Vector2 vector) {
-    final key = _vectorize(_snapToGrid(vector));
-    final cell = _cells[key];
+    final cellKey = _cellKey(vector);
+    final pointKey = _pointKey(vector);
+    final cell = _cells[cellKey];
     if (cell == null) return;
 
-    cell.remove(_vectorize(vector));
+    cell.remove(pointKey);
     if (cell.isEmpty) {
-      _cells.remove(key);
+      _cells.remove(cellKey);
     }
   }
 
@@ -83,16 +88,15 @@ class SpatialGrid<T> {
     return points;
   }
 
-  List<Map<Vector3, GridPoint<T>>> _getCellsInRange(Vector2 vector, double range) {
-    final List<Map<Vector3, GridPoint<T>>> cells = [];
+  List<Map<int, GridPoint<T>>> _getCellsInRange(Vector2 vector, double range) {
+    final List<Map<int, GridPoint<T>>> cells = [];
     final snapped = _snapToGrid(vector);
     final intRange = (range / resolution).ceil();
 
     for (int i = -intRange; i <= intRange; i++) {
       for (int j = -intRange; j <= intRange; j++) {
-        // Construct Vector3 keys explicitly as integers for hash stability
-        final key = Vector3(snapped.x + i, snapped.y + j, 0);
-        final cell = _cells[key];
+        final cellKey = _cellKey(Vector2(snapped.x + i, snapped.y + j));
+        final cell = _cells[cellKey];
         if (cell != null) {
           cells.add(cell);
         }

@@ -17,11 +17,11 @@ class SnakeDescription with _$SnakeDescription {
   }) = _SnakeDescription;
 }
 
-@freezed
+@unfreezed
 class SnakeEntity with _$SnakeEntity {
-  const SnakeEntity._();
+  SnakeEntity._();
 
-  const factory SnakeEntity({
+  factory SnakeEntity({
     required String id,
     required String name,
     @Vector2Converter() required Vector2 head,
@@ -40,6 +40,56 @@ class SnakeEntity with _$SnakeEntity {
   factory SnakeEntity.fromJson(Map<String, dynamic> json) => _$SnakeEntityFromJson(json);
 
   bool get isBoosting => boost && score > 10;
+
+  void updateInPlace({
+    Vector2? newHead,
+    double? newAngle,
+    double? newDesiredAngle,
+    int? newScore,
+    bool? newBoost,
+    List<Vector2>? newTracers,
+    String? newSkin,
+    bool? newDead,
+    int? newEliminations,
+    double? newBoostTimer,
+    Vector2? newPreviousDrop,
+  }) {
+    if (newHead != null) {
+      head.setFrom(newHead);
+    }
+    if (newAngle != null) {
+      angle = newAngle;
+    }
+    if (newDesiredAngle != null) {
+      desiredAngle = newDesiredAngle;
+    }
+    if (newScore != null) {
+      score = newScore;
+    }
+    if (newBoost != null) {
+      boost = newBoost;
+    }
+    if (newTracers != null) {
+      tracers
+        ..clear()
+        ..addAll(newTracers);
+    }
+    if (newSkin != null) {
+      skin = newSkin;
+    }
+    if (newDead != null) {
+      dead = newDead;
+    }
+    if (newEliminations != null) {
+      eliminations = newEliminations;
+    }
+    if (newBoostTimer != null) {
+      boostTimer = newBoostTimer;
+    }
+    if (newPreviousDrop != null) {
+      previousDropPosition = newPreviousDrop;
+    }
+  }
 
   SnakeDescription describe() {
     // Ported from: src/shared/store/snakes/snake-utils.ts

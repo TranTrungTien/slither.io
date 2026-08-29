@@ -1,4 +1,6 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import '../../models/snake.dart';
@@ -9,15 +11,18 @@ class SnakeComponent extends Component {
   final String id;
   SnakeEntity? _entity;
 
-  // Reuse paint objects to avoid allocation in render()
-  final Paint _bodyPaint = Paint();
-  final Paint _headPaint = Paint();
-  final Paint _outlinePaint = Paint()
+  static final Paint _bodyPaint = Paint()..strokeCap = StrokeCap.round;
+  static final Paint _headPaint = Paint();
+  static final Paint _outlinePaint = Paint()
     ..color = Colors.black.withAlpha(50)
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.5;
-  final Paint _glowPaint = Paint()
-    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10.0);
+  static final Paint _eyePaint = Paint()..color = Colors.white;
+  static final Paint _pupilPaint = Paint()..color = Colors.black;
+  static final Paint _boostPaint = Paint();
+
+  final Float32List _pointBuffer = Float32List(2048 * 2);
+  int _pointCount = 0;
 
   SnakeComponent(this.id);
 
@@ -32,42 +37,41 @@ class SnakeComponent extends Component {
 
     final description = entity.describe();
     final radius = description.radius;
-
     final skin = SkinPresets.getById(entity.skin);
+    final tintList = (entity.isBoosting && skin.boostTint != null) ? skin.boostTint! : skin.tint;
+
     _bodyPaint.color = skin.primary ?? CatppuccinColors.mauve;
+    _bodyPaint.strokeWidth = radius * 2.0;
     _headPaint.color = skin.primary?.withValues(red: 200) ?? CatppuccinColors.mauve.withValues(red: 200);
 
-    // 1. Draw body tracers
-    // Performance: If there are too many tracers, we can skip some for rendering
-    // since they overlap significantly in "To và Khít" mode.
-    const int renderStep = 2;
+    final renderStep = math.max(2, entity.tracers.length ~/ 100);
+    _pointCount = 0;
 
     for (int i = entity.tracers.length - 1; i >= 0; i -= renderStep) {
+      if (_pointCount >= 1024) break;
       final pos = entity.tracers[i];
-
-      final List<Color> tints = (entity.isBoosting && skin.boostTint != null)
-          ? skin.boostTint!
-          : skin.tint;
-
-      if (tints.isNotEmpty) {
-        _bodyPaint.color = tints[i % tints.length];
+      if (tintList.isNotEmpty) {
+       _bodyPaint.color = tintList[i % tintList.length];
       }
-
-      canvas.drawCircle(pos.toOffset(), radius, _bodyPaint);
-      canvas.drawCircle(pos.toOffset(), radius, _outlinePaint);
+      _pointBuffer[_pointCount * 2] = pos.x;
+      _pointBuffer[_pointCount * 2 + 1] = pos.y;
+      _pointCount++;
     }
 
-    // 2. Draw head
+    if (_pointCount > 0) {
+      canvas.drawRawPoints(
+       ui.PointMode.points,
+       Float32List.sublistView(_pointBuffer, 0, _pointCount * 2),
+       _bodyPaint,
+      );
+    }
+
     canvas.drawCircle(entity.head.toOffset(), radius * 1.2, _headPaint);
 
-    // Boost glow
     if (entity.isBoosting) {
-      canvas.drawCircle(entity.head.toOffset(), radius * 1.5, _glowPaint..color = (skin.primary ?? CatppuccinColors.mauve).withAlpha(100));
+      _boostPaint.color = (skin.primary ?? CatppuccinColors.mauve).withAlpha(60);
+      canvas.drawCircle(entity.head.toOffset(), radius * 1.5, _boostPaint);
     }
-
-    // 3. Eyes
-    final eyePaint = Paint()..color = Colors.white;
-    final pupilPaint = Paint()..color = Colors.black;
 
     final forward = Vector2(math.cos(entity.angle), math.sin(entity.angle));
     final right = Vector2(-forward.y, forward.x);
@@ -75,21 +79,13 @@ class SnakeComponent extends Component {
     final leftEyeBase = entity.head + (forward * radius * 0.8) + (right * radius * 0.6);
     final rightEyeBase = entity.head + (forward * radius * 0.8) - (right * radius * 0.6);
 
-    canvas.drawCircle(leftEyeBase.toOffset(), radius * 0.4, eyePaint);
-    canvas.drawCircle(rightEyeBase.toOffset(), radius * 0.4, eyePaint);
+    canvas.drawCircle(leftEyeBase.toOffset(), radius * 0.4, _eyePaint);
+    canvas.drawCircle(rightEyeBase.toOffset(), radius * 0.4, _eyePaint);
 
     final leftPupil = leftEyeBase + (forward * radius * 0.1);
     final rightPupil = rightEyeBase + (forward * radius * 0.1);
 
-    canvas.drawCircle(leftPupil.toOffset(), radius * 0.2, pupilPaint);
-    canvas.drawCircle(rightPupil.toOffset(), radius * 0.2, pupilPaint);
-
-    // Boost glow
-    if (entity.isBoosting) {
-       final glowPaint = Paint()
-         ..color = (skin.primary ?? CatppuccinColors.mauve).withAlpha(100)
-         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10.0);
-       canvas.drawCircle(entity.head.toOffset(), radius * 1.5, glowPaint);
-    }
+    canvas.drawCircle(leftPupil.toOffset(), radius * 0.2, _pupilPaint);
+    canvas.drawCircle(rightPupil.toOffset(), radius * 0.2, _pupilPaint);
   }
 }
