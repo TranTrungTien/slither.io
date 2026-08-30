@@ -11,9 +11,8 @@ class MinimapOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final snakes = ref.watch(snakeProvider).snakes;
+    final snakes = ref.watch(snakeProvider);
     const double size = 150.0;
-    final tick = DateTime.now().millisecondsSinceEpoch ~/ 200;
 
     return Positioned(
       bottom: 20,
@@ -43,7 +42,6 @@ class MinimapOverlay extends ConsumerWidget {
               painter: _MinimapPainter(
                 snakes: snakes.values.toList(),
                 worldBounds: GameConstants.worldBounds,
-                tick: tick,
               ),
             ),
           ],
@@ -54,11 +52,10 @@ class MinimapOverlay extends ConsumerWidget {
 }
 
 class _MinimapPainter extends CustomPainter {
-  final List<dynamic> snakes; // SnakeEntity
+  final List<SnakeEntity> snakes;
   final double worldBounds;
-  final int tick;
 
-  _MinimapPainter({required this.snakes, required this.worldBounds, required this.tick});
+  _MinimapPainter({required this.snakes, required this.worldBounds});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -72,6 +69,7 @@ class _MinimapPainter extends CustomPainter {
     canvas.drawCircle(center, radius, borderPaint);
 
     for (final snake in snakes) {
+      if (snake.dead) continue;
       final isLocal = snake.id == 'local_player';
 
       final nx = map(snake.head.x as double, -worldBounds, worldBounds, 0, 1);
@@ -93,5 +91,5 @@ class _MinimapPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _MinimapPainter oldDelegate) => oldDelegate.tick != tick;
+  bool shouldRepaint(covariant _MinimapPainter oldDelegate) => true;
 }

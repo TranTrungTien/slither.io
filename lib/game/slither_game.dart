@@ -57,7 +57,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   void _maintainBots(Map<String, SnakeEntity> snakes) {
     if (snakes.length < minSnakes) {
       final random = math.Random();
-      final id = 'bot_${DateTime.now().microsecondsSinceEpoch}';
+      final id = const Uuid().v4();
       final skin = SkinPresets.allSkins[random.nextInt(SkinPresets.allSkins.length)];
 
       final pos = Vector2(
@@ -80,7 +80,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     if (dt <= 0) return;
     super.update(dt);
 
-    final snakes = ref.read(snakeProvider).snakes;
+    final snakes = ref.read(snakeProvider);
     final candies = ref.read(candyProvider);
 
     _maintainBots(snakes);
@@ -103,7 +103,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
 
     ref.read(snakeProvider.notifier).updateTick(dt, onBoostDrop: (pos, amount) {
       ref.read(candyProvider.notifier).addCandy(CandyEntity(
-       id: 'drop_${DateTime.now().microsecondsSinceEpoch}_${pos.x}',
+       id: 'drop_${const Uuid().v4()}',
        size: amount,
        position: pos,
        color: CatppuccinColors.surface2,
@@ -111,7 +111,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       ));
     });
 
-    final updatedSnakes = ref.read(snakeProvider).snakes;
+    final updatedSnakes = ref.read(snakeProvider);
     final updatedCandies = ref.read(candyProvider);
 
     _collisionSystem.checkCollisions(
@@ -147,7 +147,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       _syncComponents();
     }
 
-    final localSnake = ref.read(snakeProvider).snakes['local_player'];
+    final localSnake = ref.read(snakeProvider)['local_player'];
     if (localSnake != null && !localSnake.dead) {
       camera.viewfinder.position = localSnake.head;
 
@@ -200,7 +200,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void _handleSnakeDeath(String snakeId) {
-    final snakes = ref.read(snakeProvider).snakes;
+    final snakes = ref.read(snakeProvider);
     final snake = snakes[snakeId];
     if (snake == null || snake.dead) return;
 
@@ -248,7 +248,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
 
     final skin = SkinPresets.getById(snake.skin);
 
-    final timestamp = DateTime.now().microsecondsSinceEpoch;
+    final uuid = const Uuid();
     for (int i = 0; i < candyPositions.length; i++) {
       final pos = candyPositions[i];
       Color color = skin.primary ?? CatppuccinColors.peach;
@@ -257,7 +257,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       }
 
       loot.add(CandyEntity(
-        id: 'loot_${timestamp}_$i',
+        id: 'loot_${uuid.v4()}',
         size: sizePerCandy,
         position: pos,
         color: color,
@@ -270,7 +270,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void _syncComponents() {
-    final snakes = ref.read(snakeProvider).snakes;
+    final snakes = ref.read(snakeProvider);
     final candies = ref.read(candyProvider);
 
     // 1. Sync Snakes
@@ -327,7 +327,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     if (event is KeyRepeatEvent) return KeyEventResult.ignored;
 
     final isSpace = keysPressed.contains(LogicalKeyboardKey.space);
-    final localSnake = ref.read(snakeProvider).snakes['local_player'];
+    final localSnake = ref.read(snakeProvider)['local_player'];
 
     if (localSnake != null && localSnake.boost != isSpace) {
       if (isSpace && localSnake.score > 10) {
@@ -352,7 +352,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void _handleInput(Vector2 screenPos) {
-    final localSnake = ref.read(snakeProvider).snakes['local_player'];
+    final localSnake = ref.read(snakeProvider)['local_player'];
     if (localSnake == null || localSnake.dead) return;
 
     final size = canvasSize;

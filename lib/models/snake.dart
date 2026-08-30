@@ -17,11 +17,11 @@ class SnakeDescription with _$SnakeDescription {
   }) = _SnakeDescription;
 }
 
-@unfreezed
+@freezed
 class SnakeEntity with _$SnakeEntity {
-  SnakeEntity._();
+  const SnakeEntity._();
 
-  factory SnakeEntity({
+  const factory SnakeEntity({
     required String id,
     required String name,
     @Vector2Converter() required Vector2 head,
@@ -35,81 +35,25 @@ class SnakeEntity with _$SnakeEntity {
     required int eliminations,
     @Default(0.0) double boostTimer,
     @Vector2Converter() Vector2? previousDropPosition,
+    @JsonKey(includeFromJson: false, includeToJson: false) SnakeDescription? cachedDescription,
   }) = _SnakeEntity;
 
   factory SnakeEntity.fromJson(Map<String, dynamic> json) => _$SnakeEntityFromJson(json);
 
   bool get isBoosting => boost && score > 10;
 
-  SnakeDescription? _cachedDescription;
-  int? _cachedScore;
-
-  void updateInPlace({
-    Vector2? newHead,
-    double? newAngle,
-    double? newDesiredAngle,
-    int? newScore,
-    bool? newBoost,
-    List<Vector2>? newTracers,
-    String? newSkin,
-    bool? newDead,
-    int? newEliminations,
-    double? newBoostTimer,
-    Vector2? newPreviousDrop,
-  }) {
-    if (newHead != null) {
-      head.setFrom(newHead);
-    }
-    if (newAngle != null) {
-      angle = newAngle;
-    }
-    if (newDesiredAngle != null) {
-      desiredAngle = newDesiredAngle;
-    }
-    if (newScore != null) {
-      score = newScore;
-      _cachedScore = null;
-      _cachedDescription = null;
-    }
-    if (newBoost != null) {
-      boost = newBoost;
-    }
-    if (newTracers != null) {
-      tracers
-        ..clear()
-        ..addAll(newTracers);
-    }
-    if (newSkin != null) {
-      skin = newSkin;
-    }
-    if (newDead != null) {
-      dead = newDead;
-    }
-    if (newEliminations != null) {
-      eliminations = newEliminations;
-    }
-    if (newBoostTimer != null) {
-      boostTimer = newBoostTimer;
-    }
-    if (newPreviousDrop != null) {
-      previousDropPosition = newPreviousDrop;
-    }
-  }
-
   SnakeDescription describe() {
-    if (_cachedDescription != null && _cachedScore == score) {
-      return _cachedDescription!;
+    if (cachedDescription != null) {
+      return cachedDescription!;
     }
 
     final radius = math.max(0.7 * (math.log(score / 300.0 + 2.0) / math.ln10), 0.5) * 60.0;
-    _cachedDescription = SnakeDescription(
+    return SnakeDescription(
       radius: radius,
       spacingAtHead: 0.12 * radius,
       spacingAtTail: 0.15 * radius,
       length: (64.0 * (math.log(score / 256.0 + 1.0) / math.ln10) + 3.0) * 6.0,
       turnSpeed: (math.max(360.0 - 100.0 * (math.log(score / 150.0 + 1.0) / math.ln10), 45.0) * math.pi / 180.0),
     );
-    _cachedScore = score;
-    return _cachedDescription!;
   }
 }

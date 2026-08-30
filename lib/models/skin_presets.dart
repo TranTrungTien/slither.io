@@ -17,24 +17,25 @@ class SkinPresets {
     'yellow', 'green', 'teal', 'sky', 'sapphire', 'blue', 'lavender'
   ].map((id) => _createCatppuccinSkin(id, _getCatppuccinColor(id))).toList();
 
+  static const Map<String, Color> _catppuccinColorMap = {
+    'rosewater': CatppuccinColors.rosewater,
+    'flamingo': CatppuccinColors.flamingo,
+    'pink': CatppuccinColors.pink,
+    'mauve': CatppuccinColors.mauve,
+    'red': CatppuccinColors.red,
+    'maroon': CatppuccinColors.maroon,
+    'peach': CatppuccinColors.peach,
+    'yellow': CatppuccinColors.yellow,
+    'green': CatppuccinColors.green,
+    'teal': CatppuccinColors.teal,
+    'sky': CatppuccinColors.sky,
+    'sapphire': CatppuccinColors.sapphire,
+    'blue': CatppuccinColors.blue,
+    'lavender': CatppuccinColors.lavender,
+  };
+
   static Color _getCatppuccinColor(String id) {
-    switch (id) {
-      case 'rosewater': return CatppuccinColors.rosewater;
-      case 'flamingo': return CatppuccinColors.flamingo;
-      case 'pink': return CatppuccinColors.pink;
-      case 'mauve': return CatppuccinColors.mauve;
-      case 'red': return CatppuccinColors.red;
-      case 'maroon': return CatppuccinColors.maroon;
-      case 'peach': return CatppuccinColors.peach;
-      case 'yellow': return CatppuccinColors.yellow;
-      case 'green': return CatppuccinColors.green;
-      case 'teal': return CatppuccinColors.teal;
-      case 'sky': return CatppuccinColors.sky;
-      case 'sapphire': return CatppuccinColors.sapphire;
-      case 'blue': return CatppuccinColors.blue;
-      case 'lavender': return CatppuccinColors.lavender;
-      default: return CatppuccinColors.mauve;
-    }
+    return _catppuccinColorMap[id] ?? CatppuccinColors.mauve;
   }
 
   static SnakeSkin _createCatppuccinSkin(String id, Color color) {

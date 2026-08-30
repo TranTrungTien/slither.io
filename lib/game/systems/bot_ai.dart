@@ -15,9 +15,12 @@ enum BehaviorMode {
 class BotAI {
   final String id;
   final double seed;
-  double _timer = 0;
+  late double _timer;
+  final math.Random _random = math.Random();
 
-  BotAI(this.id) : seed = math.Random().nextDouble() * 255;
+  BotAI(this.id) : seed = math.Random().nextDouble() * 255 {
+    _timer = math.Random().nextDouble(); // Stagger initial update
+  }
 
   void update(
     double dt,
@@ -57,9 +60,8 @@ class BotAI {
       return;
     }
 
-    final random = math.Random();
-    final range = random.nextDouble() > 0.2 ? 20.0 : 180.0;
-    final turnAmount = (random.nextDouble() * 2 - 1) * range * (math.pi / 180.0);
+    final range = _random.nextDouble() > 0.2 ? 20.0 : 180.0;
+    final turnAmount = (_random.nextDouble() * 2 - 1) * range * (math.pi / 180.0);
     onTurn(id, snake.angle + turnAmount);
   }
 
@@ -86,8 +88,7 @@ class BotAI {
   }
 
   void _flee(SnakeEntity snake, Vector2 enemyDirection, void Function(String id, double angle) onTurn) {
-    final random = math.Random();
-    final angle = math.atan2(enemyDirection.y, enemyDirection.x) + math.pi + (random.nextDouble() * 2 - 1) * 0.17;
+    final angle = math.atan2(enemyDirection.y, enemyDirection.x) + math.pi + (_random.nextDouble() * 2 - 1) * 0.17;
     onTurn(id, angle);
   }
 
@@ -114,8 +115,7 @@ class BotAI {
   }
 
   BehaviorMode _getBehavior() {
-    final random = math.Random();
-    if (random.nextDouble() > 0.7) {
+    if (_random.nextDouble() > 0.7) {
       return BehaviorMode.scavenging;
     }
     return BehaviorMode.idle;

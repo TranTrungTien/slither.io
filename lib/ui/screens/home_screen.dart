@@ -117,14 +117,14 @@ class _SkinCarousel extends StatelessWidget {
               width: isSelected ? 100 : 80,
               margin: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
-                color: skin.primary?.withAlpha(50),
+                color: (skin.primary ?? CatppuccinColors.mauve).withAlpha(50),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelected ? skin.primary! : Colors.white10,
+                  color: isSelected ? (skin.primary ?? CatppuccinColors.mauve) : Colors.white10,
                   width: 3,
                 ),
                 boxShadow: isSelected ? [
-                  BoxShadow(color: skin.primary!.withAlpha(100), blurRadius: 10)
+                  BoxShadow(color: (skin.primary ?? CatppuccinColors.mauve).withAlpha(100), blurRadius: 10)
                 ] : [],
               ),
               child: Center(
@@ -132,7 +132,7 @@ class _SkinCarousel extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: skin.primary,
+                    color: skin.primary ?? CatppuccinColors.mauve,
                     shape: BoxShape.circle,
                   ),
                 ),

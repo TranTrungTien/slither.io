@@ -13,7 +13,7 @@ class HudOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final snakes = ref.watch(snakeProvider).snakes;
+    final snakes = ref.watch(snakeProvider);
     final localSnake = snakes['local_player'];
 
     // Compute ranking

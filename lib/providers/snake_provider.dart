@@ -8,17 +8,18 @@ import '../utils/math_utils.dart';
 
 // Ported from: src/shared/store/snakes/snake-slice.ts
 
-class SnakeNotifier extends ChangeNotifier {
-  Map<String, SnakeEntity> _snakes = {};
+class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
+  final math.Random _random = math.Random();
 
-  Map<String, SnakeEntity> get snakes => _snakes;
+  @override
+  Map<String, SnakeEntity> build() => {};
 
   void addSnake(String id, {String? name, Vector2? head, String? skin, int? score}) {
     final headPos = head ?? Vector2.zero();
     final newSnake = SnakeEntity(
       id: id,
       name: name ?? id,
-      head: headPos,
+      head: headPos.clone(),
       angle: 0,
       desiredAngle: 0,
       score: score ?? GameConstants.initialScore,
@@ -27,59 +28,58 @@ class SnakeNotifier extends ChangeNotifier {
       skin: skin ?? 'default',
       dead: false,
       eliminations: 0,
-      previousDropPosition: headPos,
+      previousDropPosition: headPos.clone(),
     );
 
-    _snakes = {..._snakes, id: newSnake};
-    notifyListeners();
+    state = {...state, id: newSnake};
   }
 
   void turnSnake(String id, double desiredAngle) {
-    final snake = _snakes[id];
+    final snake = state[id];
     if (snake == null) return;
-    snake.desiredAngle = desiredAngle;
-    notifyListeners();
+    state = {...state, id: snake.copyWith(desiredAngle: desiredAngle)};
   }
 
   void boostSnake(String id, bool boost) {
-    final snake = _snakes[id];
+    final snake = state[id];
     if (snake == null) return;
-    snake.boost = boost;
-    notifyListeners();
+    state = {...state, id: snake.copyWith(boost: boost)};
   }
 
   void killSnake(String id) {
-    final snake = _snakes[id];
+    final snake = state[id];
     if (snake == null) return;
-    snake.dead = true;
-    notifyListeners();
+    state = {...state, id: snake.copyWith(dead: true)};
   }
 
   void removeSnake(String id) {
-    _snakes.remove(id);
-    notifyListeners();
+    final newState = Map<String, SnakeEntity>.from(state);
+    newState.remove(id);
+    state = newState;
   }
 
   void incrementScore(String id, int amount) {
-    final snake = _snakes[id];
+    final snake = state[id];
     if (snake == null) return;
-    snake.score = math.max(0, snake.score + amount);
-    notifyListeners();
+    state = {...state, id: snake.copyWith(score: math.max(0, snake.score + amount))};
   }
 
   void incrementEliminations(String id) {
-    final snake = _snakes[id];
+    final snake = state[id];
     if (snake == null) return;
-    snake.eliminations += 1;
-    notifyListeners();
+    state = {...state, id: snake.copyWith(eliminations: snake.eliminations + 1)};
   }
 
   void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
     const double tiny = 0.0001;
+    final Map<String, SnakeEntity> nextState = {};
 
-    for (final entry in _snakes.entries) {
-      final snake = entry.value;
-      if (snake.dead) continue;
+    for (final entry in state.entries) {
+      SnakeEntity snake = entry.value;
+      if (snake.dead) {
+        nextState[entry.key] = snake;
+        continue;
+      }
 
       double currentBoostTimer = snake.boostTimer;
       int currentScore = snake.score;
@@ -90,7 +90,7 @@ class SnakeNotifier extends ChangeNotifier {
         if (currentBoostTimer >= 0.15) {
           currentBoostTimer = 0.0;
           final int maxDecrease = (3 + 0.001 * currentScore).round().clamp(2, 10);
-          final int drain = math.Random().nextInt(maxDecrease) + 1;
+          final int drain = _random.nextInt(maxDecrease) + 1;
           currentScore = math.max(0, currentScore - drain);
 
           final description = snake.describe();
@@ -107,20 +107,18 @@ class SnakeNotifier extends ChangeNotifier {
         currentBoostTimer = 0.0;
       }
 
+      // Bug 2 Fix: Invalidate description cache if score changed
+      if (currentScore != snake.score) {
+        snake = snake.copyWith(score: currentScore, cachedDescription: null);
+      }
+
       final description = snake.describe();
       final speed = snake.isBoosting ? GameConstants.snakeBoostSpeed : GameConstants.snakeSpeed;
       final angle = turnRadians(snake.angle, snake.desiredAngle, description.turnSpeed * dt);
       final direction = Vector2(math.cos(angle), math.sin(angle));
       final nextHead = snake.head + (direction * (speed * dt));
 
-      snake.head.setFrom(nextHead);
-      snake.angle = angle;
-      snake.score = currentScore;
-      snake.boostTimer = currentBoostTimer;
-      snake.previousDropPosition = previousDropPosition;
-
-      final tracers = snake.tracers;
-      final int currentLength = tracers.length;
+      final List<Vector2> tracers = List.from(snake.tracers);
       final int desiredLength = description.length.floor();
       final Vector2 temp = Vector2.zero();
       final Vector2 tailVar = Vector2.zero();
@@ -128,18 +126,22 @@ class SnakeNotifier extends ChangeNotifier {
       while (tracers.length > desiredLength) {
         tracers.removeLast();
       }
+
+      // Bug 1 Fix: Spawn at last tracer or head
+      final Vector2 spawnPoint = tracers.isNotEmpty ? tracers.last.clone() : snake.head.clone();
       while (tracers.length < desiredLength) {
-        tracers.add(Vector2.zero());
+        tracers.add(spawnPoint.clone());
       }
 
       for (int i = 0; i < desiredLength; i++) {
-        final Vector2 tracer = tracers[i];
-        final Vector2 previous = i == 0 ? snake.head : tracers[i - 1];
+        final Vector2 tracer = tracers[i].clone(); // Clone to update
+        final Vector2 previous = i == 0 ? nextHead : tracers[i - 1];
 
+        // Bug 2 Fix: Use desiredLength - 1 as denominator
         final double spacing = map(
           i.toDouble(),
           0,
-          math.max(1.0, currentLength.toDouble()),
+          math.max(1.0, (desiredLength - 1).toDouble()),
           description.spacingAtHead,
           description.spacingAtTail,
         );
@@ -152,19 +154,28 @@ class SnakeNotifier extends ChangeNotifier {
           temp.lerp(previous, alpha);
           tailVar.setFrom(temp);
           tailVar.lerp(previous, stretch);
-          tracer.setFrom(tailVar);
+          tracers[i] = tailVar.clone();
         } else {
           temp.setFrom(tracer);
           temp.lerp(previous, alpha);
-          tracer.setFrom(temp);
+          tracers[i] = temp.clone();
         }
       }
+
+      nextState[entry.key] = snake.copyWith(
+        head: nextHead,
+        angle: angle,
+        boostTimer: currentBoostTimer,
+        previousDropPosition: previousDropPosition,
+        tracers: tracers,
+        cachedDescription: description, // Cache for current frame
+      );
     }
 
-    notifyListeners();
+    state = nextState;
   }
 }
 
-final snakeProvider = ChangeNotifierProvider<SnakeNotifier>((ref) {
+final snakeProvider = NotifierProvider<SnakeNotifier, Map<String, SnakeEntity>>(() {
   return SnakeNotifier();
 });

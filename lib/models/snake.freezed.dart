@@ -227,38 +227,23 @@ SnakeEntity _$SnakeEntityFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$SnakeEntity {
   String get id => throw _privateConstructorUsedError;
-  set id(String value) => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  set name(String value) => throw _privateConstructorUsedError;
   @Vector2Converter()
   Vector2 get head => throw _privateConstructorUsedError;
-  @Vector2Converter()
-  set head(Vector2 value) => throw _privateConstructorUsedError;
   double get angle => throw _privateConstructorUsedError;
-  set angle(double value) => throw _privateConstructorUsedError;
   double get desiredAngle => throw _privateConstructorUsedError;
-  set desiredAngle(double value) => throw _privateConstructorUsedError;
   int get score => throw _privateConstructorUsedError;
-  set score(int value) => throw _privateConstructorUsedError;
   bool get boost => throw _privateConstructorUsedError;
-  set boost(bool value) => throw _privateConstructorUsedError;
   @Vector2Converter()
   List<Vector2> get tracers => throw _privateConstructorUsedError;
-  @Vector2Converter()
-  set tracers(List<Vector2> value) => throw _privateConstructorUsedError;
   String get skin => throw _privateConstructorUsedError;
-  set skin(String value) => throw _privateConstructorUsedError;
   bool get dead => throw _privateConstructorUsedError;
-  set dead(bool value) => throw _privateConstructorUsedError;
   int get eliminations => throw _privateConstructorUsedError;
-  set eliminations(int value) => throw _privateConstructorUsedError;
   double get boostTimer => throw _privateConstructorUsedError;
-  set boostTimer(double value) => throw _privateConstructorUsedError;
   @Vector2Converter()
   Vector2? get previousDropPosition => throw _privateConstructorUsedError;
-  @Vector2Converter()
-  set previousDropPosition(Vector2? value) =>
-      throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  SnakeDescription? get cachedDescription => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -285,7 +270,11 @@ abstract class $SnakeEntityCopyWith<$Res> {
       bool dead,
       int eliminations,
       double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition});
+      @Vector2Converter() Vector2? previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      SnakeDescription? cachedDescription});
+
+  $SnakeDescriptionCopyWith<$Res>? get cachedDescription;
 }
 
 /// @nodoc
@@ -314,6 +303,7 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
     Object? eliminations = null,
     Object? boostTimer = null,
     Object? previousDropPosition = freezed,
+    Object? cachedDescription = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -368,7 +358,23 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
           ? _value.previousDropPosition
           : previousDropPosition // ignore: cast_nullable_to_non_nullable
               as Vector2?,
+      cachedDescription: freezed == cachedDescription
+          ? _value.cachedDescription
+          : cachedDescription // ignore: cast_nullable_to_non_nullable
+              as SnakeDescription?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SnakeDescriptionCopyWith<$Res>? get cachedDescription {
+    if (_value.cachedDescription == null) {
+      return null;
+    }
+
+    return $SnakeDescriptionCopyWith<$Res>(_value.cachedDescription!, (value) {
+      return _then(_value.copyWith(cachedDescription: value) as $Val);
+    });
   }
 }
 
@@ -393,7 +399,12 @@ abstract class _$$SnakeEntityImplCopyWith<$Res>
       bool dead,
       int eliminations,
       double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition});
+      @Vector2Converter() Vector2? previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      SnakeDescription? cachedDescription});
+
+  @override
+  $SnakeDescriptionCopyWith<$Res>? get cachedDescription;
 }
 
 /// @nodoc
@@ -420,6 +431,7 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
     Object? eliminations = null,
     Object? boostTimer = null,
     Object? previousDropPosition = freezed,
+    Object? cachedDescription = freezed,
   }) {
     return _then(_$SnakeEntityImpl(
       id: null == id
@@ -451,7 +463,7 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
           : boost // ignore: cast_nullable_to_non_nullable
               as bool,
       tracers: null == tracers
-          ? _value.tracers
+          ? _value._tracers
           : tracers // ignore: cast_nullable_to_non_nullable
               as List<Vector2>,
       skin: null == skin
@@ -474,6 +486,10 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
           ? _value.previousDropPosition
           : previousDropPosition // ignore: cast_nullable_to_non_nullable
               as Vector2?,
+      cachedDescription: freezed == cachedDescription
+          ? _value.cachedDescription
+          : cachedDescription // ignore: cast_nullable_to_non_nullable
+              as SnakeDescription?,
     ));
   }
 }
@@ -481,7 +497,7 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$SnakeEntityImpl extends _SnakeEntity {
-  _$SnakeEntityImpl(
+  const _$SnakeEntityImpl(
       {required this.id,
       required this.name,
       @Vector2Converter() required this.head,
@@ -489,52 +505,109 @@ class _$SnakeEntityImpl extends _SnakeEntity {
       required this.desiredAngle,
       required this.score,
       required this.boost,
-      @Vector2Converter() required this.tracers,
+      @Vector2Converter() required final List<Vector2> tracers,
       required this.skin,
       required this.dead,
       required this.eliminations,
       this.boostTimer = 0.0,
-      @Vector2Converter() this.previousDropPosition})
-      : super._();
+      @Vector2Converter() this.previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      this.cachedDescription})
+      : _tracers = tracers,
+        super._();
 
   factory _$SnakeEntityImpl.fromJson(Map<String, dynamic> json) =>
       _$$SnakeEntityImplFromJson(json);
 
   @override
-  String id;
+  final String id;
   @override
-  String name;
-  @override
-  @Vector2Converter()
-  Vector2 head;
-  @override
-  double angle;
-  @override
-  double desiredAngle;
-  @override
-  int score;
-  @override
-  bool boost;
+  final String name;
   @override
   @Vector2Converter()
-  List<Vector2> tracers;
+  final Vector2 head;
   @override
-  String skin;
+  final double angle;
   @override
-  bool dead;
+  final double desiredAngle;
   @override
-  int eliminations;
+  final int score;
+  @override
+  final bool boost;
+  final List<Vector2> _tracers;
+  @override
+  @Vector2Converter()
+  List<Vector2> get tracers {
+    if (_tracers is EqualUnmodifiableListView) return _tracers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tracers);
+  }
+
+  @override
+  final String skin;
+  @override
+  final bool dead;
+  @override
+  final int eliminations;
   @override
   @JsonKey()
-  double boostTimer;
+  final double boostTimer;
   @override
   @Vector2Converter()
-  Vector2? previousDropPosition;
+  final Vector2? previousDropPosition;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final SnakeDescription? cachedDescription;
 
   @override
   String toString() {
-    return 'SnakeEntity(id: $id, name: $name, head: $head, angle: $angle, desiredAngle: $desiredAngle, score: $score, boost: $boost, tracers: $tracers, skin: $skin, dead: $dead, eliminations: $eliminations, boostTimer: $boostTimer, previousDropPosition: $previousDropPosition)';
+    return 'SnakeEntity(id: $id, name: $name, head: $head, angle: $angle, desiredAngle: $desiredAngle, score: $score, boost: $boost, tracers: $tracers, skin: $skin, dead: $dead, eliminations: $eliminations, boostTimer: $boostTimer, previousDropPosition: $previousDropPosition, cachedDescription: $cachedDescription)';
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SnakeEntityImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.head, head) || other.head == head) &&
+            (identical(other.angle, angle) || other.angle == angle) &&
+            (identical(other.desiredAngle, desiredAngle) ||
+                other.desiredAngle == desiredAngle) &&
+            (identical(other.score, score) || other.score == score) &&
+            (identical(other.boost, boost) || other.boost == boost) &&
+            const DeepCollectionEquality().equals(other._tracers, _tracers) &&
+            (identical(other.skin, skin) || other.skin == skin) &&
+            (identical(other.dead, dead) || other.dead == dead) &&
+            (identical(other.eliminations, eliminations) ||
+                other.eliminations == eliminations) &&
+            (identical(other.boostTimer, boostTimer) ||
+                other.boostTimer == boostTimer) &&
+            (identical(other.previousDropPosition, previousDropPosition) ||
+                other.previousDropPosition == previousDropPosition) &&
+            (identical(other.cachedDescription, cachedDescription) ||
+                other.cachedDescription == cachedDescription));
+  }
+
+  @JsonKey(ignore: true)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      head,
+      angle,
+      desiredAngle,
+      score,
+      boost,
+      const DeepCollectionEquality().hash(_tracers),
+      skin,
+      dead,
+      eliminations,
+      boostTimer,
+      previousDropPosition,
+      cachedDescription);
 
   @JsonKey(ignore: true)
   @override
@@ -551,70 +624,59 @@ class _$SnakeEntityImpl extends _SnakeEntity {
 }
 
 abstract class _SnakeEntity extends SnakeEntity {
-  factory _SnakeEntity(
-      {required String id,
-      required String name,
-      @Vector2Converter() required Vector2 head,
-      required double angle,
-      required double desiredAngle,
-      required int score,
-      required bool boost,
-      @Vector2Converter() required List<Vector2> tracers,
-      required String skin,
-      required bool dead,
-      required int eliminations,
-      double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition}) = _$SnakeEntityImpl;
-  _SnakeEntity._() : super._();
+  const factory _SnakeEntity(
+      {required final String id,
+      required final String name,
+      @Vector2Converter() required final Vector2 head,
+      required final double angle,
+      required final double desiredAngle,
+      required final int score,
+      required final bool boost,
+      @Vector2Converter() required final List<Vector2> tracers,
+      required final String skin,
+      required final bool dead,
+      required final int eliminations,
+      final double boostTimer,
+      @Vector2Converter() final Vector2? previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final SnakeDescription? cachedDescription}) = _$SnakeEntityImpl;
+  const _SnakeEntity._() : super._();
 
   factory _SnakeEntity.fromJson(Map<String, dynamic> json) =
       _$SnakeEntityImpl.fromJson;
 
   @override
   String get id;
-  set id(String value);
   @override
   String get name;
-  set name(String value);
   @override
   @Vector2Converter()
   Vector2 get head;
-  @Vector2Converter()
-  set head(Vector2 value);
   @override
   double get angle;
-  set angle(double value);
   @override
   double get desiredAngle;
-  set desiredAngle(double value);
   @override
   int get score;
-  set score(int value);
   @override
   bool get boost;
-  set boost(bool value);
   @override
   @Vector2Converter()
   List<Vector2> get tracers;
-  @Vector2Converter()
-  set tracers(List<Vector2> value);
   @override
   String get skin;
-  set skin(String value);
   @override
   bool get dead;
-  set dead(bool value);
   @override
   int get eliminations;
-  set eliminations(int value);
   @override
   double get boostTimer;
-  set boostTimer(double value);
   @override
   @Vector2Converter()
   Vector2? get previousDropPosition;
-  @Vector2Converter()
-  set previousDropPosition(Vector2? value);
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  SnakeDescription? get cachedDescription;
   @override
   @JsonKey(ignore: true)
   _$$SnakeEntityImplCopyWith<_$SnakeEntityImpl> get copyWith =>

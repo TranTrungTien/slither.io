@@ -9,16 +9,29 @@ import '../overlays/minimap_overlay.dart';
 import '../overlays/death_overlay.dart';
 import '../overlays/alerts_overlay.dart';
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  late final SlitherGame _game;
+
+  @override
+  void initState() {
+    super.initState();
+    _game = SlitherGame(ref);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           GameWidget<SlitherGame>(
-            game: SlitherGame(ref),
+            game: _game,
             backgroundBuilder: (context) => Container(
               color: CatppuccinColors.crust,
             ),
@@ -27,7 +40,7 @@ class GameScreen extends ConsumerWidget {
               'minimap': (context, game) => const MinimapOverlay(),
               'alerts': (context, game) => const AlertsOverlay(),
               'death': (context, game) {
-                final score = ref.read(snakeProvider).snakes['local_player']?.score ?? 0;
+                final score = ref.read(snakeProvider)['local_player']?.score ?? 0;
                 return DeathOverlay(
                   finalScore: score,
                   onRestart: () {
