@@ -35,11 +35,11 @@ class CatppuccinColors {
 }
 
 class GameConstants {
-  static const double worldBounds = 2000.0;
+  static const double worldBounds = 4000.0;
   static const double worldTick = 0.05; // 20 Hz
 
-  static const double snakeSpeed = 150.0;
-  static const double snakeBoostSpeed = 300.0;
+  static const double snakeSpeed = 180.0;
+  static const double snakeBoostSpeed = 350.0;
 
   static const int initialScore = 10;
   static const int boostScoreThreshold = 10;

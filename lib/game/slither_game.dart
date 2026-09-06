@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show KeyEventResult;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../utils/constants.dart';
 import '../providers/snake_provider.dart';
 import '../providers/candy_provider.dart';
@@ -14,8 +16,9 @@ import '../models/candy.dart';
 import '../models/alert.dart';
 import '../models/skin_presets.dart';
 import 'components/snake_component.dart';
-import 'components/candy_component.dart';
+import 'components/candy_layer.dart';
 import 'components/world_bounds.dart';
+import 'components/background_grid.dart';
 import 'systems/collision_system.dart';
 import 'systems/bot_ai.dart';
 
@@ -24,24 +27,40 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   final CollisionSystem _collisionSystem = CollisionSystem();
   final Map<String, BotAI> _botAIs = {};
 
+  // Layers
+  late final CandyLayer _candyLayer;
+
   // Cache components to avoid O(N) lookups in children list
   final Map<String, SnakeComponent> _snakeComponents = {};
-  final Map<String, CandyComponent> _candyComponents = {};
+
+  // UI Throttle
+  final UIUpdateNotifier uiUpdateNotifier = UIUpdateNotifier();
+  double _uiTimer = 0.0;
 
   static const int minSnakes = 20;
   int? _lastRank;
-  double _rankTimer = 0.0;
   double _syncTimer = 0.0;
 
   SlitherGame(this.ref);
 
   @override
+  void onRemove() {
+    uiUpdateNotifier.dispose();
+    super.onRemove();
+  }
+
+  @override
   Future<void> onLoad() async {
+    // Add grid first
+    world.add(BackgroundGrid());
     world.add(WorldBounds());
+
+    _candyLayer = CandyLayer(_collisionSystem);
+    world.add(_candyLayer);
 
     Future.microtask(() {
       spawnPlayer();
-      ref.read(candyProvider.notifier).spawnRandomCandy(500);
+      ref.read(candyProvider.notifier).spawnRandomCandy(800);
     });
   }
 
@@ -60,15 +79,17 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       final id = const Uuid().v4();
       final skin = SkinPresets.allSkins[random.nextInt(SkinPresets.allSkins.length)];
 
-      final pos = Vector2(
-        (random.nextDouble() * 2 - 1) * GameConstants.worldBounds * 0.8,
-        (random.nextDouble() * 2 - 1) * GameConstants.worldBounds * 0.8,
-      );
+      // Spawn bots far from the player at (0,0)
+      double posX, posY;
+      do {
+        posX = (random.nextDouble() * 2 - 1) * GameConstants.worldBounds * 0.9;
+        posY = (random.nextDouble() * 2 - 1) * GameConstants.worldBounds * 0.9;
+      } while (math.sqrt(posX * posX + posY * posY) < 500);
 
       ref.read(snakeProvider.notifier).addSnake(
         id,
         name: 'Bot ${random.nextInt(1000)}',
-        head: pos,
+        head: Vector2(posX, posY),
         skin: skin.id,
       );
       _botAIs[id] = BotAI(id);
@@ -97,6 +118,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
         snakes,
         candies,
         _collisionSystem.snakeGrid,
+        _collisionSystem.candyGrid,
         (id, angle) => ref.read(snakeProvider.notifier).turnSnake(id, angle),
       );
     }
@@ -141,10 +163,21 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       },
     );
 
+    // Sync components: Snakes every frame
+    _syncSnakes(updatedSnakes);
+    _candyLayer.updateCandies(updatedCandies);
+    
     _syncTimer += dt;
-    if (_syncTimer >= GameConstants.worldTick) {
+    if (_syncTimer >= 0.5) { // Slower rank sync
       _syncTimer = 0.0;
-      _syncComponents();
+      _updateRank(updatedSnakes);
+    }
+
+    // UI Throttle: Notify every 0.1s
+    _uiTimer += dt;
+    if (_uiTimer >= 0.1) {
+      _uiTimer = 0.0;
+      uiUpdateNotifier.notify();
     }
 
     final localSnake = ref.read(snakeProvider)['local_player'];
@@ -152,50 +185,11 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       camera.viewfinder.position = localSnake.head;
 
       final description = localSnake.describe();
-      final double targetZoom = 1.2 / (description.radius * 0.05 + 1.0);
-      camera.viewfinder.zoom = targetZoom;
-
-      _rankTimer += dt;
-      if (_rankTimer >= 0.5) {
-       _rankTimer = 0.0;
-       final sortedSnakes = updatedSnakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
-       final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
-       final rank = rankIndex != -1 ? rankIndex + 1 : null;
-
-       if (rank != null && _lastRank != null && rank < _lastRank!) {
-         if (rank == 1) {
-           ref.read(alertProvider.notifier).sendAlert(
-             emoji: '🏆',
-             message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
-             color: CatppuccinColors.yellow,
-             scope: AlertScope.ranking,
-           );
-         } else if (rank == 2) {
-           ref.read(alertProvider.notifier).sendAlert(
-             emoji: '🥈',
-             message: 'CONGRATULATIONS! YOU ARE IN SECOND PLACE',
-             color: CatppuccinColors.sapphire,
-             scope: AlertScope.ranking,
-           );
-         } else if (rank == 3) {
-           ref.read(alertProvider.notifier).sendAlert(
-             emoji: '🥉',
-             message: 'CONGRATULATIONS! YOU ARE IN THIRD PLACE',
-             color: CatppuccinColors.maroon,
-             scope: AlertScope.ranking,
-           );
-         } else {
-           ref.read(alertProvider.notifier).sendAlert(
-             emoji: '📈',
-             message: 'RANK UP: #$rank',
-             color: CatppuccinColors.blue,
-             scope: AlertScope.ranking,
-           );
-         }
-         AudioService.play(SlitherSound.alertNeutral);
-       }
-       _lastRank = rank;
-      }
+      // Reduced zoom to see more of the world
+      final double targetZoom = 1.4 / (description.radius * 0.02 + 1.0);
+      
+      // Smoothly interpolate zoom
+      camera.viewfinder.zoom += (targetZoom - camera.viewfinder.zoom) * dt * 1.5;
     }
   }
 
@@ -269,15 +263,11 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     ref.read(snakeProvider.notifier).killSnake(snakeId);
   }
 
-  void _syncComponents() {
-    final snakes = ref.read(snakeProvider);
-    final candies = ref.read(candyProvider);
-
-    // 1. Sync Snakes
-    final snakeIdsToRemove = _snakeComponents.keys.where((id) => !snakes.containsKey(id)).toList();
-    for (final id in snakeIdsToRemove) {
-      _snakeComponents.remove(id)?.removeFromParent();
-    }
+  void _syncSnakes(Map<String, SnakeEntity> snakes) {
+    final activeIds = snakes.keys.toSet();
+    _snakeComponents.keys.where((id) => !activeIds.contains(id)).toList().forEach((id) {
+       _snakeComponents.remove(id)?.removeFromParent();
+    });
 
     for (final snake in snakes.values) {
       final existing = _snakeComponents[snake.id];
@@ -289,37 +279,42 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
         existing.updateEntity(snake);
       }
     }
+  }
 
-    // 2. Sync Candies (Frustum Culling + ID Caching)
-    final viewport = camera.visibleWorldRect;
+  void _updateRank(Map<String, SnakeEntity> snakes) {
+    final localSnake = snakes['local_player'];
+    if (localSnake == null || localSnake.dead) return;
 
-    // Cleanup removed candies
-    final candyIdsToRemove = _candyComponents.keys.where((id) => !candies.containsKey(id)).toList();
-    for (final id in candyIdsToRemove) {
-      _candyComponents.remove(id)?.removeFromParent();
-    }
+    final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
+    final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
+    final rank = rankIndex != -1 ? rankIndex + 1 : null;
 
-    for (final candy in candies.values) {
-      if (candy.eatenAt != null) continue;
-
-      final isVisible = viewport.contains(candy.position.toOffset());
-      final existing = _candyComponents[candy.id];
-
-      if (isVisible) {
-        if (existing == null) {
-          final comp = CandyComponent(candy.id)..updateEntity(candy);
-          _candyComponents[candy.id] = comp;
-          world.add(comp);
-        } else {
-          existing.updateEntity(candy);
-        }
+    if (rank != null && _lastRank != null && rank < _lastRank!) {
+      if (rank == 1) {
+        ref.read(alertProvider.notifier).sendAlert(
+          emoji: '🏆',
+          message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
+          color: CatppuccinColors.yellow,
+          scope: AlertScope.ranking,
+        );
+      } else if (rank <= 3) {
+        ref.read(alertProvider.notifier).sendAlert(
+          emoji: '🥈',
+          message: 'CONGRATULATIONS! YOU ARE IN TOP 3',
+          color: CatppuccinColors.sapphire,
+          scope: AlertScope.ranking,
+        );
       } else {
-        if (existing != null) {
-          _candyComponents.remove(candy.id);
-          existing.removeFromParent();
-        }
+        ref.read(alertProvider.notifier).sendAlert(
+          emoji: '📈',
+          message: 'RANK UP: #$rank',
+          color: CatppuccinColors.blue,
+          scope: AlertScope.ranking,
+        );
       }
+      AudioService.play(SlitherSound.alertNeutral);
     }
+    _lastRank = rank;
   }
 
   @override
@@ -364,4 +359,8 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       ref.read(snakeProvider.notifier).turnSnake('local_player', angle);
     }
   }
+}
+
+class UIUpdateNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
 }

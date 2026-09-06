@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flame/extensions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/snake.dart';
 import '../utils/constants.dart';
@@ -15,11 +14,11 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
   Map<String, SnakeEntity> build() => {};
 
   void addSnake(String id, {String? name, Vector2? head, String? skin, int? score}) {
-    final headPos = head ?? Vector2.zero();
+    final headPos = head?.clone() ?? Vector2.zero();
     final newSnake = SnakeEntity(
       id: id,
       name: name ?? id,
-      head: headPos.clone(),
+      head: headPos,
       angle: 0,
       desiredAngle: 0,
       score: score ?? GameConstants.initialScore,
@@ -61,7 +60,13 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
   void incrementScore(String id, int amount) {
     final snake = state[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(score: math.max(0, snake.score + amount))};
+    state = {
+      ...state, 
+      id: snake.copyWith(
+        score: math.max(0, snake.score + amount),
+        cachedDescription: null, // Force recalculation on next tick
+      )
+    };
   }
 
   void incrementEliminations(String id) {
@@ -71,7 +76,6 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
   }
 
   void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
-    const double tiny = 0.0001;
     final Map<String, SnakeEntity> nextState = {};
 
     for (final entry in state.entries) {
@@ -97,7 +101,7 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
           final tail = snake.tracers.isNotEmpty ? snake.tracers.last : null;
 
           if (tail != null && onBoostDrop != null) {
-            if (tail.distanceTo(previousDropPosition) > description.radius * 2) {
+            if (tail.distanceToSquared(previousDropPosition) > description.radius * description.radius * 4) {
               previousDropPosition = tail.clone();
               onBoostDrop(tail, drain);
             }
@@ -107,7 +111,7 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
         currentBoostTimer = 0.0;
       }
 
-      // Bug 2 Fix: Invalidate description cache if score changed
+      // Important: Invalidate cache if boost drained points
       if (currentScore != snake.score) {
         snake = snake.copyWith(score: currentScore, cachedDescription: null);
       }
@@ -115,50 +119,54 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
       final description = snake.describe();
       final speed = snake.isBoosting ? GameConstants.snakeBoostSpeed : GameConstants.snakeSpeed;
       final angle = turnRadians(snake.angle, snake.desiredAngle, description.turnSpeed * dt);
-      final direction = Vector2(math.cos(angle), math.sin(angle));
-      final nextHead = snake.head + (direction * (speed * dt));
+      
+      final nextHead = Vector2(
+        snake.head.x + math.cos(angle) * (speed * dt),
+        snake.head.y + math.sin(angle) * (speed * dt),
+      );
 
-      final List<Vector2> tracers = List.from(snake.tracers);
-      final int desiredLength = description.length.floor();
-      final Vector2 temp = Vector2.zero();
-      final Vector2 tailVar = Vector2.zero();
-
-      while (tracers.length > desiredLength) {
-        tracers.removeLast();
+      final double length = description.length;
+      final int desiredCount = length.ceil(); 
+      final double fraction = length % 1.0;
+      
+      // Fix: Create a modifiable copy to avoid "unmodifiable list" error
+      final List<Vector2> tracers = List<Vector2>.of(snake.tracers);
+      
+      // Adjust list size
+      if (tracers.length > desiredCount) {
+        tracers.removeRange(desiredCount, tracers.length);
       }
 
-      // Bug 1 Fix: Spawn at last tracer or head
-      final Vector2 spawnPoint = tracers.isNotEmpty ? tracers.last.clone() : snake.head.clone();
-      while (tracers.length < desiredLength) {
-        tracers.add(spawnPoint.clone());
-      }
-
-      for (int i = 0; i < desiredLength; i++) {
-        final Vector2 tracer = tracers[i].clone(); // Clone to update
-        final Vector2 previous = i == 0 ? nextHead : tracers[i - 1];
-
-        // Bug 2 Fix: Use desiredLength - 1 as denominator
-        final double spacing = map(
+      for (int i = 0; i < desiredCount; i++) {
+        final Vector2 prev = i == 0 ? nextHead : tracers[i - 1];
+        
+        final double baseSpacing = map(
           i.toDouble(),
           0,
-          math.max(1.0, (desiredLength - 1).toDouble()),
+          math.max(1.0, (desiredCount - 1).toDouble()),
           description.spacingAtHead,
           description.spacingAtTail,
         );
 
-        final double alpha = ((dt * speed) / spacing).clamp(tiny, 1.0 - tiny);
+        final double spacing = (i == desiredCount - 1 && fraction > 0) 
+            ? baseSpacing * fraction 
+            : baseSpacing;
 
-        if (i == desiredLength - 1) {
-          final double stretch = math.max(description.length % 1, tiny);
-          temp.setFrom(tracer);
-          temp.lerp(previous, alpha);
-          tailVar.setFrom(temp);
-          tailVar.lerp(previous, stretch);
-          tracers[i] = tailVar.clone();
+        if (i < tracers.length) {
+          // Update existing Vector2 in-place (performance optimization)
+          final Vector2 current = tracers[i];
+          final double dx = current.x - prev.x;
+          final double dy = current.y - prev.y;
+          final double distSq = dx * dx + dy * dy;
+
+          if (distSq > spacing * spacing) {
+            final double dist = math.sqrt(distSq);
+            final double ratio = spacing / dist;
+            current.setValues(prev.x + dx * ratio, prev.y + dy * ratio);
+          }
         } else {
-          temp.setFrom(tracer);
-          temp.lerp(previous, alpha);
-          tracers[i] = temp.clone();
+          // Add new segment (cloning prev to start at a valid position)
+          tracers.add(prev.clone());
         }
       }
 
@@ -167,8 +175,8 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
         angle: angle,
         boostTimer: currentBoostTimer,
         previousDropPosition: previousDropPosition,
-        tracers: tracers,
-        cachedDescription: description, // Cache for current frame
+        tracers: tracers, // Same list reference, new values
+        cachedDescription: description,
       );
     }
 

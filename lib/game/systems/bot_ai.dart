@@ -28,6 +28,7 @@ class BotAI {
     Map<String, SnakeEntity> snakes,
     Map<String, CandyEntity> candies,
     SpatialGrid<String> snakeGrid,
+    SpatialGrid<String> candyGrid,
     void Function(String id, double angle) onTurn,
   ) {
     _timer += dt;
@@ -47,7 +48,7 @@ class BotAI {
         _idle(snake, onTurn);
         break;
       case BehaviorMode.scavenging:
-        _scavenge(snake, candies, onTurn);
+        _scavenge(snake, candies, candyGrid, onTurn);
         break;
     }
   }
@@ -65,38 +66,37 @@ class BotAI {
     onTurn(id, snake.angle + turnAmount);
   }
 
-  void _scavenge(SnakeEntity snake, Map<String, CandyEntity> candies, void Function(String id, double angle) onTurn) {
-    CandyEntity? target;
-    double minDistance = 150.0;
-
-    for (final candy in candies.values) {
-      if (candy.eatenAt != null) continue;
-      final dist = snake.head.distanceTo(candy.position);
-      if (dist < minDistance) {
-        minDistance = dist;
-        target = candy;
-      }
-    }
-
-    if (target == null) {
+  void _scavenge(
+    SnakeEntity snake,
+    Map<String, CandyEntity> candies,
+    SpatialGrid<String> candyGrid,
+    void Function(String id, double angle) onTurn,
+  ) {
+    // Spatial grid nearest is much faster than iterating all candies
+    final nearestCandyPoint = candyGrid.nearest(snake.head, 400.0);
+    
+    if (nearestCandyPoint == null) {
       _idle(snake, onTurn);
       return;
     }
 
-    final angle = math.atan2(target.position.y - snake.head.y, target.position.x - snake.head.x);
+    final angle = math.atan2(
+      nearestCandyPoint.position.y - snake.head.y,
+      nearestCandyPoint.position.x - snake.head.x,
+    );
     onTurn(id, angle);
   }
 
   void _flee(SnakeEntity snake, Vector2 enemyDirection, void Function(String id, double angle) onTurn) {
-    final angle = math.atan2(enemyDirection.y, enemyDirection.x) + math.pi + (_random.nextDouble() * 2 - 1) * 0.17;
+    final angle = math.atan2(enemyDirection.y, enemyDirection.x) + math.pi + (_random.nextDouble() * 2 - 1) * 0.2;
     onTurn(id, angle);
   }
 
   Vector2? _directionToNearestEnemy(SnakeEntity snake, Map<String, SnakeEntity> snakes, SpatialGrid<String> snakeGrid) {
     final description = snake.describe();
-    final radius = description.radius * 10;
+    final radius = description.radius * 1.5;
 
-    final nearestPoint = snakeGrid.nearest(snake.head, radius * 10 + 30, (point) {
+    final nearestPoint = snakeGrid.nearest(snake.head, radius * 8.0 + 50.0, (point) {
       return point.metadata != snake.id;
     });
 
@@ -105,11 +105,15 @@ class BotAI {
     final enemy = snakes[nearestPoint.metadata];
     if (enemy == null || enemy.dead) return null;
 
-    final direction = nearestPoint.position - snake.head;
-    final enemyRadius = enemy.describe().radius * 10;
+    final dx = nearestPoint.position.x - snake.head.x;
+    final dy = nearestPoint.position.y - snake.head.y;
+    final distSq = dx * dx + dy * dy;
+    
+    final enemyRadius = enemy.describe().radius;
+    final alertDist = 5.0 * (radius + enemyRadius);
 
-    if (direction.length <= 5 * (radius + enemyRadius)) {
-      return direction.normalized();
+    if (distSq <= alertDist * alertDist) {
+      return nearestPoint.position - snake.head;
     }
     return null;
   }

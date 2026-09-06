@@ -4,95 +4,94 @@ import '../../providers/snake_provider.dart';
 import '../../providers/player_provider.dart';
 import '../../utils/constants.dart';
 import '../../models/snake.dart';
+import '../../game/slither_game.dart';
 import 'compass_overlay.dart';
 
-// Ported from: src/client/components/stats/stats.tsx
-
 class HudOverlay extends ConsumerWidget {
-  const HudOverlay({super.key});
+  final SlitherGame game;
+  const HudOverlay({super.key, required this.game});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final snakes = ref.watch(snakeProvider);
-    final localSnake = snakes['local_player'];
-
-    // Compute ranking
-    final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
-    final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
-    final rank = rankIndex != -1 ? rankIndex + 1 : null;
-
-    final player = ref.watch(playerProvider).value;
-
     return Stack(
       children: [
-        const CompassOverlay(),
+        CompassOverlay(game: game),
 
-        // Bottom Left: Stats
-        Positioned(
-          bottom: 20,
-          left: 20,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _StatsCard(
-                emoji: '☠️',
-                label: 'KOs',
-                value: localSnake?.eliminations.toString() ?? 'N/A',
-                primary: const Color(0xFFA1A3C2),
-                secondary: const Color(0xFF61618A),
-              ),
-              const SizedBox(height: 8),
-              _StatsCard(
-                emoji: '🏆',
-                label: 'Rank',
-                value: rank != null ? _formatRank(rank) : 'N/A',
-                primary: const Color(0xFFFFCB50),
-                secondary: const Color(0xFFFF964F),
-              ),
-              const SizedBox(height: 8),
-              _StatsCard(
-                emoji: '💯',
-                label: 'Score',
-                value: localSnake?.score.toString() ?? 'N/A',
-                primary: const Color(0xFFB54040),
-                secondary: const Color(0xFF963B54),
-              ),
-              const SizedBox(height: 8),
-              _StatsCard(
-                emoji: '💵',
-                label: 'Cash',
-                value: '\$${player?.balance ?? 0}',
-                primary: const Color(0xFF6F9E4F),
-                secondary: const Color(0xFF99B56B),
-              ),
-            ],
-          ),
-        ),
+        // Throttled HUD Elements
+        AnimatedBuilder(
+          animation: game.uiUpdateNotifier,
+          builder: (context, child) {
+            final snakes = ref.read(snakeProvider);
+            final localSnake = snakes['local_player'];
 
-        // Top Right: Leaderboard
-        Positioned(
-          top: 20,
-          right: 20,
-          child: _Leaderboard(snakes: sortedSnakes.take(10).toList()),
+            // Compute ranking
+            final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
+            
+            final player = ref.read(playerProvider).value;
+
+            final currentLength = localSnake?.describe().length.floor() ?? 0;
+
+            return Stack(
+              children: [
+                // Bottom Left: Length Indicator like in Image 1
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black45,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      'Your length: $currentLength',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Stats Cards (moved up slightly)
+                Positioned(
+                  bottom: 60,
+                  left: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _StatsCard(
+                        emoji: '☠️',
+                        label: 'KOs',
+                        value: localSnake?.eliminations.toString() ?? '0',
+                        primary: const Color(0xFFA1A3C2),
+                        secondary: const Color(0xFF61618A),
+                      ),
+                      const SizedBox(height: 8),
+                      _StatsCard(
+                        emoji: '💵',
+                        label: 'Cash',
+                        value: '\$${player?.balance ?? 0}',
+                        primary: const Color(0xFF6F9E4F),
+                        secondary: const Color(0xFF99B56B),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Top Right: Leaderboard (Matches Image 1 style)
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: _Leaderboard(snakes: sortedSnakes.take(10).toList()),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
-  }
-
-  String _formatRank(int rank) {
-    final lastDigit = rank % 10;
-    final lastTwoDigits = rank % 100;
-
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
-      return '${rank}th';
-    }
-
-    switch (lastDigit) {
-      case 1: return '${rank}st';
-      case 2: return '${rank}nd';
-      case 3: return '${rank}rd';
-      default: return '${rank}th';
-    }
   }
 }
 
@@ -172,60 +171,60 @@ class _Leaderboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: CatppuccinColors.crust.withAlpha(180),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
+      width: 200,
+      padding: const EdgeInsets.all(8),
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
-            'LEADERBOARD',
+            'Leaderboard',
             style: TextStyle(
-              color: CatppuccinColors.subtext0,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2,
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              shadows: [Shadow(color: Colors.black, blurRadius: 2)],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           ...snakes.asMap().entries.map((entry) {
             final index = entry.key;
             final snake = entry.value;
             final isLocal = snake.id == 'local_player';
 
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
+              padding: const EdgeInsets.symmetric(vertical: 1),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    '${index + 1}.',
+                    '#${index + 1} ',
                     style: TextStyle(
-                      color: isLocal ? CatppuccinColors.mauve : CatppuccinColors.subtext0,
+                      color: _getRankColor(index),
                       fontSize: 12,
                       fontWeight: isLocal ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       snake.name,
+                      textAlign: TextAlign.right,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isLocal ? CatppuccinColors.mauve : Colors.white,
+                        color: isLocal ? CatppuccinColors.mauve : Colors.white70,
                         fontSize: 12,
                         fontWeight: isLocal ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Text(
                     snake.score.toString(),
                     style: TextStyle(
-                      color: isLocal ? CatppuccinColors.mauve : CatppuccinColors.subtext1,
+                      color: isLocal ? CatppuccinColors.mauve : Colors.white70,
                       fontSize: 12,
                     ),
                   ),
@@ -236,5 +235,12 @@ class _Leaderboard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Color _getRankColor(int index) {
+    if (index == 0) return Colors.yellow;
+    if (index == 1) return Colors.grey;
+    if (index == 2) return Colors.brown;
+    return Colors.white54;
   }
 }

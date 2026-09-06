@@ -36,8 +36,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               color: CatppuccinColors.crust,
             ),
             overlayBuilderMap: {
-              'hud': (context, game) => const HudOverlay(),
-              'minimap': (context, game) => const MinimapOverlay(),
+              'hud': (context, game) => HudOverlay(game: game),
+              'minimap': (context, game) => MinimapOverlay(game: game),
               'alerts': (context, game) => const AlertsOverlay(),
               'death': (context, game) {
                 final score = ref.read(snakeProvider)['local_player']?.score ?? 0;

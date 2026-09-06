@@ -82,8 +82,41 @@ class SpatialGrid<T> {
 
     for (final cell in cellsInRange) {
       for (final point in cell.values) {
-        if (vector.distanceTo(point.position) <= range && (predicate == null || predicate(point))) {
+        if (vector.distanceToSquared(point.position) <= range * range && (predicate == null || predicate(point))) {
           points.add(point);
+        }
+      }
+    }
+    return points;
+  }
+
+  List<GridPoint<T>> allWithinRect(Rect rect, [bool Function(GridPoint<T>)? predicate]) {
+    final List<GridPoint<T>> points = [];
+    
+    final int minX = (rect.left / resolution).floor();
+    final int maxX = (rect.right / resolution).ceil();
+    final int minY = (rect.top / resolution).floor();
+    final int maxY = (rect.bottom / resolution).ceil();
+
+    final double l = rect.left;
+    final double r = rect.right;
+    final double t = rect.top;
+    final double b = rect.bottom;
+
+    for (int x = minX; x <= maxX; x++) {
+      for (int y = minY; y <= maxY; y++) {
+        final cellKey = _cellKeyXY(x, y);
+        final cell = _cells[cellKey];
+        if (cell != null) {
+          for (final point in cell.values) {
+            final px = point.position.x;
+            final py = point.position.y;
+            if (px >= l && px <= r && py >= t && py <= b) {
+              if (predicate == null || predicate(point)) {
+                points.add(point);
+              }
+            }
+          }
         }
       }
     }

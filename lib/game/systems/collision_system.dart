@@ -1,3 +1,4 @@
+import 'package:flame/extensions.dart';
 import '../../models/snake.dart';
 import '../../models/candy.dart';
 import '../../utils/constants.dart';
@@ -9,27 +10,51 @@ class CollisionSystem {
   final SpatialGrid<String> snakeGrid = SpatialGrid(50.0);
   final SpatialGrid<String> candyGrid = SpatialGrid(50.0);
 
-  void updateGrids(Map<String, SnakeEntity> snakes, Map<String, CandyEntity> candies) {
+  // Cache to track candy positions in grid to avoid full clear
+  final Map<String, Vector2> _candyPositionCache = {};
+
+  void updateSnakeGrid(Map<String, SnakeEntity> snakes) {
     snakeGrid.clear();
-    const int tracerStep = 10; // Sparse sampling for performance
+    const int tracerStep = 15; // Increased step for better performance
     for (final snake in snakes.values) {
       if (snake.dead) continue;
 
       snakeGrid.insert(snake.head, snake.id);
       final tracers = snake.tracers;
+      
+      // Only insert every Nth tracer
       for (int i = 0; i < tracers.length; i += tracerStep) {
         snakeGrid.insert(tracers[i], snake.id);
       }
-      // Always include the tail if not already included
+      
       if (tracers.isNotEmpty && (tracers.length - 1) % tracerStep != 0) {
         snakeGrid.insert(tracers.last, snake.id);
       }
     }
+  }
 
-    candyGrid.clear();
-    for (final candy in candies.values) {
-      if (candy.eatenAt != null) continue;
-      candyGrid.insert(candy.position, candy.id);
+  void updateCandyGrid(Map<String, CandyEntity> candies) {
+    // Incremental update for candies without toSet()
+    final List<String> removedIds = [];
+    for (final id in _candyPositionCache.keys) {
+      if (!candies.containsKey(id)) {
+        removedIds.add(id);
+      }
+    }
+    
+    for (final id in removedIds) {
+      final pos = _candyPositionCache.remove(id);
+      if (pos != null) candyGrid.remove(pos);
+    }
+
+    // Add new candies
+    for (final entry in candies.entries) {
+      if (!_candyPositionCache.containsKey(entry.key)) {
+        final candy = entry.value;
+        if (candy.eatenAt != null) continue;
+        candyGrid.insert(candy.position, entry.key);
+        _candyPositionCache[entry.key] = candy.position;
+      }
     }
   }
 
@@ -40,44 +65,52 @@ class CollisionSystem {
     required void Function(String snakeId) onHitWall,
     required void Function(String victimId, String killerId) onSnakeCollision,
   }) {
-    updateGrids(snakes, candies);
+    updateSnakeGrid(snakes);
+    updateCandyGrid(candies);
 
-    final sortedSnakes = snakes.values.toList()..sort((a, b) => a.score.compareTo(b.score));
-
-    for (final snake in sortedSnakes) {
+    // Optimized: Only check collisions for snakes that moved or are nearby
+    for (final snake in snakes.values) {
       if (snake.dead) continue;
 
       final description = snake.describe();
       final radius = description.radius;
 
+      // Wall check is cheap
       if (snake.head.length + radius > GameConstants.worldBounds) {
         onHitWall(snake.id);
         continue;
       }
 
       // 1. Snake-to-Snake collision
-      final nearestSnake = snakeGrid.nearest(snake.head, radius + 5.0, (point) {
+      final nearestEnemy = snakeGrid.nearest(snake.head, radius + 15.0, (point) {
         if (point.metadata == snake.id) {
-          return snake.head.distanceTo(point.position) > radius * 2.5;
+          // Self collision only if far from head
+          final dx = snake.head.x - point.position.x;
+          final dy = snake.head.y - point.position.y;
+          return (dx * dx + dy * dy) > (radius * radius * 12.0); // 3.5 * radius approx
         }
         return true;
       });
 
-      if (nearestSnake != null) {
-        final enemy = snakes[nearestSnake.metadata];
+      if (nearestEnemy != null) {
+        final enemy = snakes[nearestEnemy.metadata];
         if (enemy != null && !enemy.dead) {
           final enemyRadius = enemy.describe().radius;
-          final distance = snake.head.distanceTo(nearestSnake.position);
+          final dx = snake.head.x - nearestEnemy.position.x;
+          final dy = snake.head.y - nearestEnemy.position.y;
+          final distSq = dx * dx + dy * dy;
+          
+          final collisionDist = 0.85 * (radius + enemyRadius);
 
-          if (distance <= 0.8 * (radius + enemyRadius)) {
+          if (distSq <= collisionDist * collisionDist) {
             onSnakeCollision(snake.id, enemy.id);
             continue;
           }
         }
       }
 
-      // 2. Snake-to-Candy collision (Optimized with Spatial Grid)
-      final eatRange = radius * 1.5 + 10.0;
+      // 2. Snake-to-Candy collision
+      final eatRange = radius * 1.5 + 15.0;
       final nearbyCandies = candyGrid.allWithin(snake.head, eatRange);
 
       for (final candyPoint in nearbyCandies) {
