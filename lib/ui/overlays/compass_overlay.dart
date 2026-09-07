@@ -4,49 +4,55 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/snake_provider.dart';
 import '../../models/snake.dart';
 import '../../utils/constants.dart';
+import '../../game/slither_game.dart';
 
 class CompassOverlay extends ConsumerWidget {
-  const CompassOverlay({super.key});
+  final SlitherGame game;
+  const CompassOverlay({super.key, required this.game});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final snakes = ref.watch(snakeProvider);
-    final localSnake = snakes['local_player'];
+    return AnimatedBuilder(
+      animation: game.uiUpdateNotifier,
+      builder: (context, child) {
+        final snakes = ref.read(snakeProvider);
+        final localSnake = snakes['local_player'];
 
-    if (localSnake == null || localSnake.dead) return const SizedBox.shrink();
+        if (localSnake == null || localSnake.dead) return const SizedBox.shrink();
 
-    // Find leader
-    SnakeEntity? leader;
-    int maxScore = -1;
-    for (final snake in snakes.values) {
-      if (snake.score > maxScore) {
-        maxScore = snake.score;
-        leader = snake;
-      }
-    }
+        // Find leader
+        SnakeEntity? leader;
+        int maxScore = -1;
+        for (final snake in snakes.values) {
+          if (snake.score > maxScore) {
+            maxScore = snake.score;
+            leader = snake;
+          }
+        }
 
-    if (leader == null || leader.id == 'local_player') return const SizedBox.shrink();
+        if (leader == null || leader.id == 'local_player') return const SizedBox.shrink();
 
-    final delta = leader.head - localSnake.head;
-    if (delta.length < 100) return const SizedBox.shrink(); // Hide if very close
+        final delta = leader.head - localSnake.head;
+        if (delta.length < 100) return const SizedBox.shrink(); // Hide if very close
 
-    final angle = math.atan2(delta.y, delta.x);
+        final angle = math.atan2(delta.y, delta.x);
 
-    return Center(
-      child: IgnorePointer(
-        child: SizedBox(
-          width: 300,
-          height: 300,
-          child: Stack(
-            children: [
-              // The Crown and Arrow will be placed on a circle around the center
-              Positioned.fill(
-                child: _CompassRenderer(angle: angle),
+        return Center(
+          child: IgnorePointer(
+            child: SizedBox(
+              width: 300,
+              height: 300,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _CompassRenderer(angle: angle),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

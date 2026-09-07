@@ -242,6 +242,8 @@ mixin _$SnakeEntity {
   double get boostTimer => throw _privateConstructorUsedError;
   @Vector2Converter()
   Vector2? get previousDropPosition => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  SnakeDescription? get cachedDescription => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -268,7 +270,11 @@ abstract class $SnakeEntityCopyWith<$Res> {
       bool dead,
       int eliminations,
       double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition});
+      @Vector2Converter() Vector2? previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      SnakeDescription? cachedDescription});
+
+  $SnakeDescriptionCopyWith<$Res>? get cachedDescription;
 }
 
 /// @nodoc
@@ -297,6 +303,7 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
     Object? eliminations = null,
     Object? boostTimer = null,
     Object? previousDropPosition = freezed,
+    Object? cachedDescription = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -351,7 +358,23 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
           ? _value.previousDropPosition
           : previousDropPosition // ignore: cast_nullable_to_non_nullable
               as Vector2?,
+      cachedDescription: freezed == cachedDescription
+          ? _value.cachedDescription
+          : cachedDescription // ignore: cast_nullable_to_non_nullable
+              as SnakeDescription?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SnakeDescriptionCopyWith<$Res>? get cachedDescription {
+    if (_value.cachedDescription == null) {
+      return null;
+    }
+
+    return $SnakeDescriptionCopyWith<$Res>(_value.cachedDescription!, (value) {
+      return _then(_value.copyWith(cachedDescription: value) as $Val);
+    });
   }
 }
 
@@ -376,7 +399,12 @@ abstract class _$$SnakeEntityImplCopyWith<$Res>
       bool dead,
       int eliminations,
       double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition});
+      @Vector2Converter() Vector2? previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      SnakeDescription? cachedDescription});
+
+  @override
+  $SnakeDescriptionCopyWith<$Res>? get cachedDescription;
 }
 
 /// @nodoc
@@ -403,6 +431,7 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
     Object? eliminations = null,
     Object? boostTimer = null,
     Object? previousDropPosition = freezed,
+    Object? cachedDescription = freezed,
   }) {
     return _then(_$SnakeEntityImpl(
       id: null == id
@@ -457,6 +486,10 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
           ? _value.previousDropPosition
           : previousDropPosition // ignore: cast_nullable_to_non_nullable
               as Vector2?,
+      cachedDescription: freezed == cachedDescription
+          ? _value.cachedDescription
+          : cachedDescription // ignore: cast_nullable_to_non_nullable
+              as SnakeDescription?,
     ));
   }
 }
@@ -477,7 +510,9 @@ class _$SnakeEntityImpl extends _SnakeEntity {
       required this.dead,
       required this.eliminations,
       this.boostTimer = 0.0,
-      @Vector2Converter() this.previousDropPosition})
+      @Vector2Converter() this.previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      this.cachedDescription})
       : _tracers = tracers,
         super._();
 
@@ -520,10 +555,13 @@ class _$SnakeEntityImpl extends _SnakeEntity {
   @override
   @Vector2Converter()
   final Vector2? previousDropPosition;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final SnakeDescription? cachedDescription;
 
   @override
   String toString() {
-    return 'SnakeEntity(id: $id, name: $name, head: $head, angle: $angle, desiredAngle: $desiredAngle, score: $score, boost: $boost, tracers: $tracers, skin: $skin, dead: $dead, eliminations: $eliminations, boostTimer: $boostTimer, previousDropPosition: $previousDropPosition)';
+    return 'SnakeEntity(id: $id, name: $name, head: $head, angle: $angle, desiredAngle: $desiredAngle, score: $score, boost: $boost, tracers: $tracers, skin: $skin, dead: $dead, eliminations: $eliminations, boostTimer: $boostTimer, previousDropPosition: $previousDropPosition, cachedDescription: $cachedDescription)';
   }
 
   @override
@@ -547,7 +585,9 @@ class _$SnakeEntityImpl extends _SnakeEntity {
             (identical(other.boostTimer, boostTimer) ||
                 other.boostTimer == boostTimer) &&
             (identical(other.previousDropPosition, previousDropPosition) ||
-                other.previousDropPosition == previousDropPosition));
+                other.previousDropPosition == previousDropPosition) &&
+            (identical(other.cachedDescription, cachedDescription) ||
+                other.cachedDescription == cachedDescription));
   }
 
   @JsonKey(ignore: true)
@@ -566,7 +606,8 @@ class _$SnakeEntityImpl extends _SnakeEntity {
       dead,
       eliminations,
       boostTimer,
-      previousDropPosition);
+      previousDropPosition,
+      cachedDescription);
 
   @JsonKey(ignore: true)
   @override
@@ -584,20 +625,21 @@ class _$SnakeEntityImpl extends _SnakeEntity {
 
 abstract class _SnakeEntity extends SnakeEntity {
   const factory _SnakeEntity(
-          {required final String id,
-          required final String name,
-          @Vector2Converter() required final Vector2 head,
-          required final double angle,
-          required final double desiredAngle,
-          required final int score,
-          required final bool boost,
-          @Vector2Converter() required final List<Vector2> tracers,
-          required final String skin,
-          required final bool dead,
-          required final int eliminations,
-          final double boostTimer,
-          @Vector2Converter() final Vector2? previousDropPosition}) =
-      _$SnakeEntityImpl;
+      {required final String id,
+      required final String name,
+      @Vector2Converter() required final Vector2 head,
+      required final double angle,
+      required final double desiredAngle,
+      required final int score,
+      required final bool boost,
+      @Vector2Converter() required final List<Vector2> tracers,
+      required final String skin,
+      required final bool dead,
+      required final int eliminations,
+      final double boostTimer,
+      @Vector2Converter() final Vector2? previousDropPosition,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final SnakeDescription? cachedDescription}) = _$SnakeEntityImpl;
   const _SnakeEntity._() : super._();
 
   factory _SnakeEntity.fromJson(Map<String, dynamic> json) =
@@ -632,6 +674,9 @@ abstract class _SnakeEntity extends SnakeEntity {
   @override
   @Vector2Converter()
   Vector2? get previousDropPosition;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  SnakeDescription? get cachedDescription;
   @override
   @JsonKey(ignore: true)
   _$$SnakeEntityImplCopyWith<_$SnakeEntityImpl> get copyWith =>

@@ -6,11 +6,12 @@ import '../models/player_data.dart';
 
 class PlayerNotifier extends AsyncNotifier<PlayerData> {
   static const String boxName = 'player_data';
+  Box? _box;
 
   @override
   Future<PlayerData> build() async {
-    final box = await Hive.openBox(boxName);
-    final data = box.get('current');
+    _box ??= await Hive.openBox(boxName);
+    final data = _box!.get('current');
     if (data != null) {
       return PlayerData.fromJson(Map<String, dynamic>.from(data));
     }
@@ -50,8 +51,8 @@ class PlayerNotifier extends AsyncNotifier<PlayerData> {
   }
 
   Future<void> _save(PlayerData data) async {
-    final box = await Hive.openBox(boxName);
-    await box.put('current', data.toJson());
+    _box ??= await Hive.openBox(boxName);
+    await _box!.put('current', data.toJson());
   }
 }
 

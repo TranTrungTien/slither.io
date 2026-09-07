@@ -38,26 +38,38 @@ class CandyNotifier extends StateNotifier<Map<String, CandyEntity>> {
     final List<CandyEntity> newCandies = [];
 
     for (int i = 0; i < amount; i++) {
+      final double angle = random.nextDouble() * 2 * math.pi;
+      final double dist = math.sqrt(random.nextDouble()) * GameConstants.worldBounds;
+      
       final pos = Vector2(
-        (random.nextDouble() * 2 - 1) * GameConstants.worldBounds,
-        (random.nextDouble() * 2 - 1) * GameConstants.worldBounds,
+        math.cos(angle) * dist,
+        math.sin(angle) * dist,
       );
-
-      // Basic circle check
-      if (pos.length > GameConstants.worldBounds) {
-        i--;
-        continue;
-      }
 
       newCandies.add(CandyEntity(
         id: 'candy_${DateTime.now().microsecondsSinceEpoch}_$i',
-        size: random.nextInt(4) + 1,
+        size: random.nextInt(5) + 1,
         position: pos,
-        color: CatppuccinColors.mauve, // Default or random from palette
+        color: _getRandomColor(random),
         type: CandyType.defaultType,
       ));
     }
     populateCandy(newCandies);
+  }
+
+  Color _getRandomColor(math.Random random) {
+    const colors = [
+      CatppuccinColors.mauve,
+      CatppuccinColors.blue,
+      CatppuccinColors.green,
+      CatppuccinColors.red,
+      CatppuccinColors.peach,
+      CatppuccinColors.yellow,
+      CatppuccinColors.sapphire,
+      CatppuccinColors.flamingo,
+      CatppuccinColors.pink,
+    ];
+    return colors[random.nextInt(colors.length)];
   }
 }
 

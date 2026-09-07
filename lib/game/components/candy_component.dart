@@ -6,6 +6,9 @@ class CandyComponent extends PositionComponent {
   final String id;
   CandyEntity? _entity;
 
+  static final Paint _paint = Paint();
+  static final Paint _highlightPaint = Paint()..color = Colors.white.withAlpha(80);
+
   CandyComponent(this.id);
 
   void updateEntity(CandyEntity entity) {
@@ -20,15 +23,18 @@ class CandyComponent extends PositionComponent {
     final entity = _entity;
     if (entity == null || entity.eatenAt != null) return;
 
-    final paint = Paint()..color = entity.color;
-    canvas.drawCircle(Offset(size.x / 2, size.y / 2), size.x / 2, paint);
+    final center = Offset(size.x / 2, size.y / 2);
+    final radius = size.x / 2;
 
-    final highlightPaint = Paint()..color = Colors.white.withAlpha(120);
-    canvas.drawCircle(Offset(size.x * 0.35, size.y * 0.35), size.x * 0.2, highlightPaint);
+    _paint.color = entity.color;
+    canvas.drawCircle(center, radius, _paint);
 
-    final glowPaint = Paint()
-      ..color = entity.color.withAlpha(80)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5.0);
-    canvas.drawCircle(Offset(size.x / 2, size.y / 2), size.x * 0.8, glowPaint);
+    if (entity.size > 3) {
+      canvas.drawCircle(
+        Offset(size.x * 0.35, size.y * 0.35),
+        radius * 0.2,
+        _highlightPaint,
+      );
+    }
   }
 }

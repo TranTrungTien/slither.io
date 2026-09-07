@@ -10,18 +10,23 @@ class GridPoint<T> {
 }
 
 class SpatialGrid<T> {
-  final Map<Vector3, Map<Vector3, GridPoint<T>>> _cells = {};
+  final Map<int, Map<int, GridPoint<T>>> _cells = {};
   final double resolution;
 
   SpatialGrid(this.resolution);
 
-  Vector3 _vectorize(Vector2 v) {
-    // Round to prevent tiny float precision issues from creating separate keys
-    return Vector3(
-      (v.x * 100).roundToDouble() / 100.0,
-      (v.y * 100).roundToDouble() / 100.0,
-      0,
-    );
+  int _cellKeyXY(int x, int y) => (x << 20) ^ (y & 0xFFFFF);
+
+  int _cellKey(Vector2 value) {
+    final x = (value.x / resolution).floor();
+    final y = (value.y / resolution).floor();
+    return _cellKeyXY(x, y);
+  }
+
+  int _pointKey(Vector2 value) {
+    final x = (value.x * 100).round();
+    final y = (value.y * 100).round();
+    return _cellKeyXY(x, y);
   }
 
   Vector2 _snapToGrid(Vector2 value) {
@@ -32,19 +37,21 @@ class SpatialGrid<T> {
   }
 
   void insert(Vector2 vector, T metadata) {
-    final key = _vectorize(_snapToGrid(vector));
-    final cell = _cells.putIfAbsent(key, () => {});
-    cell[_vectorize(vector)] = GridPoint(position: vector, metadata: metadata);
+    final cellKey = _cellKey(vector);
+    final pointKey = _pointKey(vector);
+    final cell = _cells.putIfAbsent(cellKey, () => {});
+    cell[pointKey] = GridPoint(position: vector, metadata: metadata);
   }
 
   void remove(Vector2 vector) {
-    final key = _vectorize(_snapToGrid(vector));
-    final cell = _cells[key];
+    final cellKey = _cellKey(vector);
+    final pointKey = _pointKey(vector);
+    final cell = _cells[cellKey];
     if (cell == null) return;
 
-    cell.remove(_vectorize(vector));
+    cell.remove(pointKey);
     if (cell.isEmpty) {
-      _cells.remove(key);
+      _cells.remove(cellKey);
     }
   }
 
@@ -75,7 +82,7 @@ class SpatialGrid<T> {
 
     for (final cell in cellsInRange) {
       for (final point in cell.values) {
-        if (vector.distanceTo(point.position) <= range && (predicate == null || predicate(point))) {
+        if (vector.distanceToSquared(point.position) <= range * range && (predicate == null || predicate(point))) {
           points.add(point);
         }
       }
@@ -83,16 +90,50 @@ class SpatialGrid<T> {
     return points;
   }
 
-  List<Map<Vector3, GridPoint<T>>> _getCellsInRange(Vector2 vector, double range) {
-    final List<Map<Vector3, GridPoint<T>>> cells = [];
+  List<GridPoint<T>> allWithinRect(Rect rect, [bool Function(GridPoint<T>)? predicate]) {
+    final List<GridPoint<T>> points = [];
+    
+    final int minX = (rect.left / resolution).floor();
+    final int maxX = (rect.right / resolution).ceil();
+    final int minY = (rect.top / resolution).floor();
+    final int maxY = (rect.bottom / resolution).ceil();
+
+    final double l = rect.left;
+    final double r = rect.right;
+    final double t = rect.top;
+    final double b = rect.bottom;
+
+    for (int x = minX; x <= maxX; x++) {
+      for (int y = minY; y <= maxY; y++) {
+        final cellKey = _cellKeyXY(x, y);
+        final cell = _cells[cellKey];
+        if (cell != null) {
+          for (final point in cell.values) {
+            final px = point.position.x;
+            final py = point.position.y;
+            if (px >= l && px <= r && py >= t && py <= b) {
+              if (predicate == null || predicate(point)) {
+                points.add(point);
+              }
+            }
+          }
+        }
+      }
+    }
+    return points;
+  }
+
+  List<Map<int, GridPoint<T>>> _getCellsInRange(Vector2 vector, double range) {
+    final List<Map<int, GridPoint<T>>> cells = [];
     final snapped = _snapToGrid(vector);
     final intRange = (range / resolution).ceil();
+    final int snappedX = snapped.x.toInt();
+    final int snappedY = snapped.y.toInt();
 
     for (int i = -intRange; i <= intRange; i++) {
       for (int j = -intRange; j <= intRange; j++) {
-        // Construct Vector3 keys explicitly as integers for hash stability
-        final key = Vector3(snapped.x + i, snapped.y + j, 0);
-        final cell = _cells[key];
+        final cellKey = _cellKeyXY(snappedX + i, snappedY + j);
+        final cell = _cells[cellKey];
         if (cell != null) {
           cells.add(cell);
         }
