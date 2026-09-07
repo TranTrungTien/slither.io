@@ -114,11 +114,9 @@ class CollisionSystem {
 
       // 2. Snake-to-Candy collision
       final eatRange = radius * 1.5 + 15.0;
-      final nearbyCandies = candyGrid.allWithin(snake.head, eatRange);
-
-      for (final candyPoint in nearbyCandies) {
+      candyGrid.forEachWithin(snake.head, eatRange, (candyPoint) {
         onEatCandy(candyPoint.metadata, snake.id);
-      }
+      });
     }
   }
 }

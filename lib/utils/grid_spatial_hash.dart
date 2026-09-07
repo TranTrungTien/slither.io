@@ -29,13 +29,6 @@ class SpatialGrid<T> {
     return _cellKeyXY(x, y);
   }
 
-  Vector2 _snapToGrid(Vector2 value) {
-    return Vector2(
-      (value.x / resolution).floorToDouble(),
-      (value.y / resolution).floorToDouble(),
-    );
-  }
-
   void insert(Vector2 vector, T metadata) {
     final cellKey = _cellKey(vector);
     final pointKey = _pointKey(vector);
@@ -64,21 +57,44 @@ class SpatialGrid<T> {
     double range, [
     bool Function(GridPoint<T>)? predicate,
   ]) {
-    final cellsInRange = _getCellsInRange(vector, range);
     GridPoint<T>? nearestPoint;
     double nearestDistance = range;
 
-    for (final cell in cellsInRange) {
-      for (final point in cell.values) {
-        final distance = vector.distanceTo(point.position);
-        if (distance < nearestDistance &&
-            (predicate == null || predicate(point))) {
-          nearestPoint = point;
-          nearestDistance = distance;
+    forEachWithin(vector, range, (point) {
+      final distance = vector.distanceTo(point.position);
+      if (distance < nearestDistance &&
+          (predicate == null || predicate(point))) {
+        nearestPoint = point;
+        nearestDistance = distance;
+      }
+    });
+    return nearestPoint;
+  }
+
+  void forEachWithin(
+    Vector2 vector,
+    double range,
+    void Function(GridPoint<T>) onPoint, [
+    bool Function(GridPoint<T>)? predicate,
+  ]) {
+    final intRange = (range / resolution).ceil();
+    final centerX = (vector.x / resolution).floor();
+    final centerY = (vector.y / resolution).floor();
+    final rangeSquared = range * range;
+
+    for (int x = centerX - intRange; x <= centerX + intRange; x++) {
+      for (int y = centerY - intRange; y <= centerY + intRange; y++) {
+        final cell = _cells[_cellKeyXY(x, y)];
+        if (cell == null) continue;
+
+        for (final point in cell.values) {
+          if (vector.distanceToSquared(point.position) <= rangeSquared &&
+              (predicate == null || predicate(point))) {
+            onPoint(point);
+          }
         }
       }
     }
-    return nearestPoint;
   }
 
   List<GridPoint<T>> allWithin(
@@ -86,18 +102,39 @@ class SpatialGrid<T> {
     double range, [
     bool Function(GridPoint<T>)? predicate,
   ]) {
-    final cellsInRange = _getCellsInRange(vector, range);
     final List<GridPoint<T>> points = [];
+    forEachWithin(vector, range, points.add, predicate);
+    return points;
+  }
 
-    for (final cell in cellsInRange) {
-      for (final point in cell.values) {
-        if (vector.distanceToSquared(point.position) <= range * range &&
-            (predicate == null || predicate(point))) {
-          points.add(point);
+  void forEachWithinRect(
+    Rect rect,
+    void Function(GridPoint<T>) onPoint, [
+    bool Function(GridPoint<T>)? predicate,
+  ]) {
+    final int minX = (rect.left / resolution).floor();
+    final int maxX = (rect.right / resolution).ceil();
+    final int minY = (rect.top / resolution).floor();
+    final int maxY = (rect.bottom / resolution).ceil();
+
+    for (int x = minX; x <= maxX; x++) {
+      for (int y = minY; y <= maxY; y++) {
+        final cell = _cells[_cellKeyXY(x, y)];
+        if (cell == null) continue;
+
+        for (final point in cell.values) {
+          final px = point.position.x;
+          final py = point.position.y;
+          if (px >= rect.left &&
+              px <= rect.right &&
+              py >= rect.top &&
+              py <= rect.bottom &&
+              (predicate == null || predicate(point))) {
+            onPoint(point);
+          }
         }
       }
     }
-    return points;
   }
 
   List<GridPoint<T>> allWithinRect(
@@ -105,53 +142,8 @@ class SpatialGrid<T> {
     bool Function(GridPoint<T>)? predicate,
   ]) {
     final List<GridPoint<T>> points = [];
-
-    final int minX = (rect.left / resolution).floor();
-    final int maxX = (rect.right / resolution).ceil();
-    final int minY = (rect.top / resolution).floor();
-    final int maxY = (rect.bottom / resolution).ceil();
-
-    final double l = rect.left;
-    final double r = rect.right;
-    final double t = rect.top;
-    final double b = rect.bottom;
-
-    for (int x = minX; x <= maxX; x++) {
-      for (int y = minY; y <= maxY; y++) {
-        final cellKey = _cellKeyXY(x, y);
-        final cell = _cells[cellKey];
-        if (cell != null) {
-          for (final point in cell.values) {
-            final px = point.position.x;
-            final py = point.position.y;
-            if (px >= l && px <= r && py >= t && py <= b) {
-              if (predicate == null || predicate(point)) {
-                points.add(point);
-              }
-            }
-          }
-        }
-      }
-    }
+    forEachWithinRect(rect, points.add, predicate);
     return points;
   }
 
-  List<Map<int, GridPoint<T>>> _getCellsInRange(Vector2 vector, double range) {
-    final List<Map<int, GridPoint<T>>> cells = [];
-    final snapped = _snapToGrid(vector);
-    final intRange = (range / resolution).ceil();
-    final int snappedX = snapped.x.toInt();
-    final int snappedY = snapped.y.toInt();
-
-    for (int i = -intRange; i <= intRange; i++) {
-      for (int j = -intRange; j <= intRange; j++) {
-        final cellKey = _cellKeyXY(snappedX + i, snappedY + j);
-        final cell = _cells[cellKey];
-        if (cell != null) {
-          cells.add(cell);
-        }
-      }
-    }
-    return cells;
-  }
 }

@@ -25,13 +25,9 @@ class CandyLayer extends Component with HasGameReference<SlitherGame> {
     if (_candies.isEmpty) return;
 
     final viewport = game.camera.visibleWorldRect;
-    final visiblePoints = collisionSystem.candyGrid.allWithinRect(viewport);
-
-    if (visiblePoints.isEmpty) return;
-
-    for (final point in visiblePoints) {
+    collisionSystem.candyGrid.forEachWithinRect(viewport, (point) {
       final candy = _candies[point.metadata];
-      if (candy == null || candy.eatenAt != null) continue;
+      if (candy == null || candy.eatenAt != null) return;
 
       final double px = candy.position.x;
       final double py = candy.position.y;
@@ -49,6 +45,6 @@ class CandyLayer extends Component with HasGameReference<SlitherGame> {
         radius * 0.25,
         _highlightPaint,
       );
-    }
+    });
   }
 }
