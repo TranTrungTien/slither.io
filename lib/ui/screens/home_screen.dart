@@ -50,7 +50,8 @@ class HomeScreen extends ConsumerWidget {
                   _SkinCarousel(
                     currentSkin: playerData.skin,
                     ownedSkins: playerData.skins,
-                    onSelect: (id) => ref.read(playerProvider.notifier).equipSkin(id),
+                    onSelect: (id) =>
+                        ref.read(playerProvider.notifier).equipSkin(id),
                   ),
 
                 const SizedBox(height: 60),
@@ -62,7 +63,9 @@ class HomeScreen extends ConsumerWidget {
                   onPressed: () {
                     AudioService.play(SlitherSound.startGame);
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const GameScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const GameScreen(),
+                      ),
                     );
                   },
                 ),
@@ -120,12 +123,20 @@ class _SkinCarousel extends StatelessWidget {
                 color: (skin.primary ?? CatppuccinColors.mauve).withAlpha(50),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelected ? (skin.primary ?? CatppuccinColors.mauve) : Colors.white10,
+                  color: isSelected
+                      ? (skin.primary ?? CatppuccinColors.mauve)
+                      : Colors.white10,
                   width: 3,
                 ),
-                boxShadow: isSelected ? [
-                  BoxShadow(color: (skin.primary ?? CatppuccinColors.mauve).withAlpha(100), blurRadius: 10)
-                ] : [],
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: (skin.primary ?? CatppuccinColors.mauve)
+                              .withAlpha(100),
+                          blurRadius: 10,
+                        ),
+                      ]
+                    : [],
               ),
               child: Center(
                 child: Container(
@@ -164,7 +175,11 @@ class _MenuButton extends StatelessWidget {
         backgroundColor: color,
         foregroundColor: CatppuccinColors.crust,
         padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-        textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+        textStyle: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 2,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         elevation: 8,
       ),

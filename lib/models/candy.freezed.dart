@@ -12,7 +12,8 @@ part of 'candy.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 CandyEntity _$CandyEntityFromJson(Map<String, dynamic> json) {
   return _CandyEntity.fromJson(json);
@@ -39,16 +40,18 @@ mixin _$CandyEntity {
 /// @nodoc
 abstract class $CandyEntityCopyWith<$Res> {
   factory $CandyEntityCopyWith(
-          CandyEntity value, $Res Function(CandyEntity) then) =
-      _$CandyEntityCopyWithImpl<$Res, CandyEntity>;
+    CandyEntity value,
+    $Res Function(CandyEntity) then,
+  ) = _$CandyEntityCopyWithImpl<$Res, CandyEntity>;
   @useResult
-  $Res call(
-      {String id,
-      int size,
-      @Vector2Converter() Vector2 position,
-      @ColorConverter() Color color,
-      CandyType type,
-      @Vector2Converter() Vector2? eatenAt});
+  $Res call({
+    String id,
+    int size,
+    @Vector2Converter() Vector2 position,
+    @ColorConverter() Color color,
+    CandyType type,
+    @Vector2Converter() Vector2? eatenAt,
+  });
 }
 
 /// @nodoc
@@ -71,32 +74,35 @@ class _$CandyEntityCopyWithImpl<$Res, $Val extends CandyEntity>
     Object? type = null,
     Object? eatenAt = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      size: null == size
-          ? _value.size
-          : size // ignore: cast_nullable_to_non_nullable
-              as int,
-      position: null == position
-          ? _value.position
-          : position // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      color: null == color
-          ? _value.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as Color,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as CandyType,
-      eatenAt: freezed == eatenAt
-          ? _value.eatenAt
-          : eatenAt // ignore: cast_nullable_to_non_nullable
-              as Vector2?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            size: null == size
+                ? _value.size
+                : size // ignore: cast_nullable_to_non_nullable
+                      as int,
+            position: null == position
+                ? _value.position
+                : position // ignore: cast_nullable_to_non_nullable
+                      as Vector2,
+            color: null == color
+                ? _value.color
+                : color // ignore: cast_nullable_to_non_nullable
+                      as Color,
+            type: null == type
+                ? _value.type
+                : type // ignore: cast_nullable_to_non_nullable
+                      as CandyType,
+            eatenAt: freezed == eatenAt
+                ? _value.eatenAt
+                : eatenAt // ignore: cast_nullable_to_non_nullable
+                      as Vector2?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -104,17 +110,19 @@ class _$CandyEntityCopyWithImpl<$Res, $Val extends CandyEntity>
 abstract class _$$CandyEntityImplCopyWith<$Res>
     implements $CandyEntityCopyWith<$Res> {
   factory _$$CandyEntityImplCopyWith(
-          _$CandyEntityImpl value, $Res Function(_$CandyEntityImpl) then) =
-      __$$CandyEntityImplCopyWithImpl<$Res>;
+    _$CandyEntityImpl value,
+    $Res Function(_$CandyEntityImpl) then,
+  ) = __$$CandyEntityImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      int size,
-      @Vector2Converter() Vector2 position,
-      @ColorConverter() Color color,
-      CandyType type,
-      @Vector2Converter() Vector2? eatenAt});
+  $Res call({
+    String id,
+    int size,
+    @Vector2Converter() Vector2 position,
+    @ColorConverter() Color color,
+    CandyType type,
+    @Vector2Converter() Vector2? eatenAt,
+  });
 }
 
 /// @nodoc
@@ -122,8 +130,9 @@ class __$$CandyEntityImplCopyWithImpl<$Res>
     extends _$CandyEntityCopyWithImpl<$Res, _$CandyEntityImpl>
     implements _$$CandyEntityImplCopyWith<$Res> {
   __$$CandyEntityImplCopyWithImpl(
-      _$CandyEntityImpl _value, $Res Function(_$CandyEntityImpl) _then)
-      : super(_value, _then);
+    _$CandyEntityImpl _value,
+    $Res Function(_$CandyEntityImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -135,45 +144,48 @@ class __$$CandyEntityImplCopyWithImpl<$Res>
     Object? type = null,
     Object? eatenAt = freezed,
   }) {
-    return _then(_$CandyEntityImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      size: null == size
-          ? _value.size
-          : size // ignore: cast_nullable_to_non_nullable
-              as int,
-      position: null == position
-          ? _value.position
-          : position // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      color: null == color
-          ? _value.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as Color,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as CandyType,
-      eatenAt: freezed == eatenAt
-          ? _value.eatenAt
-          : eatenAt // ignore: cast_nullable_to_non_nullable
-              as Vector2?,
-    ));
+    return _then(
+      _$CandyEntityImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        size: null == size
+            ? _value.size
+            : size // ignore: cast_nullable_to_non_nullable
+                  as int,
+        position: null == position
+            ? _value.position
+            : position // ignore: cast_nullable_to_non_nullable
+                  as Vector2,
+        color: null == color
+            ? _value.color
+            : color // ignore: cast_nullable_to_non_nullable
+                  as Color,
+        type: null == type
+            ? _value.type
+            : type // ignore: cast_nullable_to_non_nullable
+                  as CandyType,
+        eatenAt: freezed == eatenAt
+            ? _value.eatenAt
+            : eatenAt // ignore: cast_nullable_to_non_nullable
+                  as Vector2?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$CandyEntityImpl implements _CandyEntity {
-  const _$CandyEntityImpl(
-      {required this.id,
-      required this.size,
-      @Vector2Converter() required this.position,
-      @ColorConverter() required this.color,
-      required this.type,
-      @Vector2Converter() this.eatenAt});
+  const _$CandyEntityImpl({
+    required this.id,
+    required this.size,
+    @Vector2Converter() required this.position,
+    @ColorConverter() required this.color,
+    required this.type,
+    @Vector2Converter() this.eatenAt,
+  });
 
   factory _$CandyEntityImpl.fromJson(Map<String, dynamic> json) =>
       _$$CandyEntityImplFromJson(json);
@@ -226,20 +238,19 @@ class _$CandyEntityImpl implements _CandyEntity {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$CandyEntityImplToJson(
-      this,
-    );
+    return _$$CandyEntityImplToJson(this);
   }
 }
 
 abstract class _CandyEntity implements CandyEntity {
-  const factory _CandyEntity(
-      {required final String id,
-      required final int size,
-      @Vector2Converter() required final Vector2 position,
-      @ColorConverter() required final Color color,
-      required final CandyType type,
-      @Vector2Converter() final Vector2? eatenAt}) = _$CandyEntityImpl;
+  const factory _CandyEntity({
+    required final String id,
+    required final int size,
+    @Vector2Converter() required final Vector2 position,
+    @ColorConverter() required final Color color,
+    required final CandyType type,
+    @Vector2Converter() final Vector2? eatenAt,
+  }) = _$CandyEntityImpl;
 
   factory _CandyEntity.fromJson(Map<String, dynamic> json) =
       _$CandyEntityImpl.fromJson;

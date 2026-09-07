@@ -12,7 +12,8 @@ part of 'player_data.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 PlayerData _$PlayerDataFromJson(Map<String, dynamic> json) {
   return _PlayerData.fromJson(json);
@@ -33,8 +34,9 @@ mixin _$PlayerData {
 /// @nodoc
 abstract class $PlayerDataCopyWith<$Res> {
   factory $PlayerDataCopyWith(
-          PlayerData value, $Res Function(PlayerData) then) =
-      _$PlayerDataCopyWithImpl<$Res, PlayerData>;
+    PlayerData value,
+    $Res Function(PlayerData) then,
+  ) = _$PlayerDataCopyWithImpl<$Res, PlayerData>;
   @useResult
   $Res call({int balance, List<String> skins, String skin});
 }
@@ -56,20 +58,23 @@ class _$PlayerDataCopyWithImpl<$Res, $Val extends PlayerData>
     Object? skins = null,
     Object? skin = null,
   }) {
-    return _then(_value.copyWith(
-      balance: null == balance
-          ? _value.balance
-          : balance // ignore: cast_nullable_to_non_nullable
-              as int,
-      skins: null == skins
-          ? _value.skins
-          : skins // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      skin: null == skin
-          ? _value.skin
-          : skin // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            balance: null == balance
+                ? _value.balance
+                : balance // ignore: cast_nullable_to_non_nullable
+                      as int,
+            skins: null == skins
+                ? _value.skins
+                : skins // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            skin: null == skin
+                ? _value.skin
+                : skin // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -77,8 +82,9 @@ class _$PlayerDataCopyWithImpl<$Res, $Val extends PlayerData>
 abstract class _$$PlayerDataImplCopyWith<$Res>
     implements $PlayerDataCopyWith<$Res> {
   factory _$$PlayerDataImplCopyWith(
-          _$PlayerDataImpl value, $Res Function(_$PlayerDataImpl) then) =
-      __$$PlayerDataImplCopyWithImpl<$Res>;
+    _$PlayerDataImpl value,
+    $Res Function(_$PlayerDataImpl) then,
+  ) = __$$PlayerDataImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int balance, List<String> skins, String skin});
@@ -89,8 +95,9 @@ class __$$PlayerDataImplCopyWithImpl<$Res>
     extends _$PlayerDataCopyWithImpl<$Res, _$PlayerDataImpl>
     implements _$$PlayerDataImplCopyWith<$Res> {
   __$$PlayerDataImplCopyWithImpl(
-      _$PlayerDataImpl _value, $Res Function(_$PlayerDataImpl) _then)
-      : super(_value, _then);
+    _$PlayerDataImpl _value,
+    $Res Function(_$PlayerDataImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -99,31 +106,33 @@ class __$$PlayerDataImplCopyWithImpl<$Res>
     Object? skins = null,
     Object? skin = null,
   }) {
-    return _then(_$PlayerDataImpl(
-      balance: null == balance
-          ? _value.balance
-          : balance // ignore: cast_nullable_to_non_nullable
-              as int,
-      skins: null == skins
-          ? _value._skins
-          : skins // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      skin: null == skin
-          ? _value.skin
-          : skin // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return _then(
+      _$PlayerDataImpl(
+        balance: null == balance
+            ? _value.balance
+            : balance // ignore: cast_nullable_to_non_nullable
+                  as int,
+        skins: null == skins
+            ? _value._skins
+            : skins // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        skin: null == skin
+            ? _value.skin
+            : skin // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$PlayerDataImpl implements _PlayerData {
-  const _$PlayerDataImpl(
-      {required this.balance,
-      required final List<String> skins,
-      required this.skin})
-      : _skins = skins;
+  const _$PlayerDataImpl({
+    required this.balance,
+    required final List<String> skins,
+    required this.skin,
+  }) : _skins = skins;
 
   factory _$PlayerDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$PlayerDataImplFromJson(json);
@@ -159,7 +168,11 @@ class _$PlayerDataImpl implements _PlayerData {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType, balance, const DeepCollectionEquality().hash(_skins), skin);
+    runtimeType,
+    balance,
+    const DeepCollectionEquality().hash(_skins),
+    skin,
+  );
 
   @JsonKey(ignore: true)
   @override
@@ -169,17 +182,16 @@ class _$PlayerDataImpl implements _PlayerData {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PlayerDataImplToJson(
-      this,
-    );
+    return _$$PlayerDataImplToJson(this);
   }
 }
 
 abstract class _PlayerData implements PlayerData {
-  const factory _PlayerData(
-      {required final int balance,
-      required final List<String> skins,
-      required final String skin}) = _$PlayerDataImpl;
+  const factory _PlayerData({
+    required final int balance,
+    required final List<String> skins,
+    required final String skin,
+  }) = _$PlayerDataImpl;
 
   factory _PlayerData.fromJson(Map<String, dynamic> json) =
       _$PlayerDataImpl.fromJson;

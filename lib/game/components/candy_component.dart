@@ -7,7 +7,8 @@ class CandyComponent extends PositionComponent {
   CandyEntity? _entity;
 
   static final Paint _paint = Paint();
-  static final Paint _highlightPaint = Paint()..color = Colors.white.withAlpha(80);
+  static final Paint _highlightPaint = Paint()
+    ..color = Colors.white.withAlpha(80);
 
   CandyComponent(this.id);
 

@@ -14,10 +14,7 @@ class Vector2Converter implements JsonConverter<Vector2, Map<String, dynamic>> {
 
   @override
   Map<String, dynamic> toJson(Vector2 object) {
-    return {
-      'x': object.x,
-      'y': object.y,
-    };
+    return {'x': object.x, 'y': object.y};
   }
 }
 

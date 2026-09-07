@@ -70,6 +70,8 @@ class AlertNotifier extends StateNotifier<List<AlertEntity>> {
   }
 }
 
-final alertProvider = StateNotifierProvider<AlertNotifier, List<AlertEntity>>((ref) {
+final alertProvider = StateNotifierProvider<AlertNotifier, List<AlertEntity>>((
+  ref,
+) {
   return AlertNotifier();
 });

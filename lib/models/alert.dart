@@ -19,5 +19,6 @@ class AlertEntity with _$AlertEntity {
     AlertScope? scope,
   }) = _AlertEntity;
 
-  factory AlertEntity.fromJson(Map<String, dynamic> json) => _$AlertEntityFromJson(json);
+  factory AlertEntity.fromJson(Map<String, dynamic> json) =>
+      _$AlertEntityFromJson(json);
 }

@@ -16,16 +16,17 @@ class CandyLayer extends Component with HasGameReference<SlitherGame> {
   }
 
   static final Paint _paint = Paint()..style = ui.PaintingStyle.fill;
-  static final Paint _highlightPaint = Paint()..color = Colors.white.withAlpha(80);
-  static final Paint _glowPaint = Paint()..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0);
+  static final Paint _highlightPaint = Paint()
+    ..color = Colors.white.withAlpha(80);
+  static final Paint _glowPaint = Paint()..style = ui.PaintingStyle.fill;
 
   @override
   void render(Canvas canvas) {
     if (_candies.isEmpty) return;
-    
+
     final viewport = game.camera.visibleWorldRect;
     final visiblePoints = collisionSystem.candyGrid.allWithinRect(viewport);
-    
+
     if (visiblePoints.isEmpty) return;
 
     for (final point in visiblePoints) {
@@ -35,14 +36,14 @@ class CandyLayer extends Component with HasGameReference<SlitherGame> {
       final double px = candy.position.x;
       final double py = candy.position.y;
       final double radius = 3.5 + (candy.size * 1.2);
-      
+
       _paint.color = candy.color;
-      _glowPaint.color = candy.color.withAlpha(40);
-      
+      _glowPaint.color = candy.color.withAlpha(35);
+
       final center = Offset(px, py);
-      canvas.drawCircle(center, radius * 1.4, _glowPaint);
+      canvas.drawCircle(center, radius * 1.8, _glowPaint);
       canvas.drawCircle(center, radius, _paint);
-      
+
       canvas.drawCircle(
         Offset(px - radius * 0.3, py - radius * 0.3),
         radius * 0.25,

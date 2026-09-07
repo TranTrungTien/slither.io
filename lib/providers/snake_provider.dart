@@ -13,7 +13,13 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
   @override
   Map<String, SnakeEntity> build() => {};
 
-  void addSnake(String id, {String? name, Vector2? head, String? skin, int? score}) {
+  void addSnake(
+    String id, {
+    String? name,
+    Vector2? head,
+    String? skin,
+    int? score,
+  }) {
     final headPos = head?.clone() ?? Vector2.zero();
     final newSnake = SnakeEntity(
       id: id,
@@ -61,21 +67,27 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
     final snake = state[id];
     if (snake == null) return;
     state = {
-      ...state, 
+      ...state,
       id: snake.copyWith(
         score: math.max(0, snake.score + amount),
         cachedDescription: null, // Force recalculation on next tick
-      )
+      ),
     };
   }
 
   void incrementEliminations(String id) {
     final snake = state[id];
     if (snake == null) return;
-    state = {...state, id: snake.copyWith(eliminations: snake.eliminations + 1)};
+    state = {
+      ...state,
+      id: snake.copyWith(eliminations: snake.eliminations + 1),
+    };
   }
 
-  void updateTick(double dt, {void Function(Vector2 position, int amount)? onBoostDrop}) {
+  void updateTick(
+    double dt, {
+    void Function(Vector2 position, int amount)? onBoostDrop,
+  }) {
     final Map<String, SnakeEntity> nextState = {};
 
     for (final entry in state.entries) {
@@ -93,7 +105,10 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
         currentBoostTimer += dt;
         if (currentBoostTimer >= 0.15) {
           currentBoostTimer = 0.0;
-          final int maxDecrease = (3 + 0.001 * currentScore).round().clamp(2, 10);
+          final int maxDecrease = (3 + 0.001 * currentScore).round().clamp(
+            2,
+            10,
+          );
           final int drain = _random.nextInt(maxDecrease) + 1;
           currentScore = math.max(0, currentScore - drain);
 
@@ -101,7 +116,8 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
           final tail = snake.tracers.isNotEmpty ? snake.tracers.last : null;
 
           if (tail != null && onBoostDrop != null) {
-            if (tail.distanceToSquared(previousDropPosition) > description.radius * description.radius * 4) {
+            if (tail.distanceToSquared(previousDropPosition) >
+                description.radius * description.radius * 4) {
               previousDropPosition = tail.clone();
               onBoostDrop(tail, drain);
             }
@@ -117,21 +133,27 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
       }
 
       final description = snake.describe();
-      final speed = snake.isBoosting ? GameConstants.snakeBoostSpeed : GameConstants.snakeSpeed;
-      final angle = turnRadians(snake.angle, snake.desiredAngle, description.turnSpeed * dt);
-      
+      final speed = snake.isBoosting
+          ? GameConstants.snakeBoostSpeed
+          : GameConstants.snakeSpeed;
+      final angle = turnRadians(
+        snake.angle,
+        snake.desiredAngle,
+        description.turnSpeed * dt,
+      );
+
       final nextHead = Vector2(
         snake.head.x + math.cos(angle) * (speed * dt),
         snake.head.y + math.sin(angle) * (speed * dt),
       );
 
       final double length = description.length;
-      final int desiredCount = length.ceil(); 
+      final int desiredCount = length.ceil();
       final double fraction = length % 1.0;
-      
+
       // Fix: Create a modifiable copy to avoid "unmodifiable list" error
       final List<Vector2> tracers = List<Vector2>.of(snake.tracers);
-      
+
       // Adjust list size
       if (tracers.length > desiredCount) {
         tracers.removeRange(desiredCount, tracers.length);
@@ -139,7 +161,7 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
 
       for (int i = 0; i < desiredCount; i++) {
         final Vector2 prev = i == 0 ? nextHead : tracers[i - 1];
-        
+
         final double baseSpacing = map(
           i.toDouble(),
           0,
@@ -148,8 +170,8 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
           description.spacingAtTail,
         );
 
-        final double spacing = (i == desiredCount - 1 && fraction > 0) 
-            ? baseSpacing * fraction 
+        final double spacing = (i == desiredCount - 1 && fraction > 0)
+            ? baseSpacing * fraction
             : baseSpacing;
 
         if (i < tracers.length) {
@@ -184,6 +206,8 @@ class SnakeNotifier extends Notifier<Map<String, SnakeEntity>> {
   }
 }
 
-final snakeProvider = NotifierProvider<SnakeNotifier, Map<String, SnakeEntity>>(() {
-  return SnakeNotifier();
-});
+final snakeProvider = NotifierProvider<SnakeNotifier, Map<String, SnakeEntity>>(
+  () {
+    return SnakeNotifier();
+  },
+);

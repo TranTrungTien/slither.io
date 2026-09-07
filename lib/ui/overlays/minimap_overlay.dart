@@ -32,14 +32,21 @@ class MinimapOverlay extends ConsumerWidget {
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
-                border: Border.all(color: CatppuccinColors.lavender.withAlpha(50), width: 2),
+                border: Border.all(
+                  color: CatppuccinColors.lavender.withAlpha(50),
+                  width: 2,
+                ),
               ),
               child: Stack(
                 children: [
                   Center(
                     child: Opacity(
                       opacity: 0.5,
-                      child: Image.asset(SlitherAssets.mapCrosshair, width: 20, height: 20),
+                      child: Image.asset(
+                        SlitherAssets.mapCrosshair,
+                        width: 20,
+                        height: 20,
+                      ),
                     ),
                   ),
                   CustomPaint(
@@ -91,8 +98,7 @@ class _MinimapPainter extends CustomPainter {
       canvas.drawCircle(pos, isLocal ? 3.0 : 1.5, dotPaint);
 
       if (isLocal) {
-        final glowPaint = Paint()
-          ..color = dotPaint.color.withAlpha(50);
+        final glowPaint = Paint()..color = dotPaint.color.withAlpha(50);
         canvas.drawCircle(pos, 5.0, glowPaint);
       }
     }

@@ -12,7 +12,8 @@ part of 'alert.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 AlertEntity _$AlertEntityFromJson(Map<String, dynamic> json) {
   return _AlertEntity.fromJson(json);
@@ -38,17 +39,19 @@ mixin _$AlertEntity {
 /// @nodoc
 abstract class $AlertEntityCopyWith<$Res> {
   factory $AlertEntityCopyWith(
-          AlertEntity value, $Res Function(AlertEntity) then) =
-      _$AlertEntityCopyWithImpl<$Res, AlertEntity>;
+    AlertEntity value,
+    $Res Function(AlertEntity) then,
+  ) = _$AlertEntityCopyWithImpl<$Res, AlertEntity>;
   @useResult
-  $Res call(
-      {int id,
-      String emoji,
-      String message,
-      @ColorConverter() Color color,
-      double duration,
-      bool visible,
-      AlertScope? scope});
+  $Res call({
+    int id,
+    String emoji,
+    String message,
+    @ColorConverter() Color color,
+    double duration,
+    bool visible,
+    AlertScope? scope,
+  });
 }
 
 /// @nodoc
@@ -72,36 +75,39 @@ class _$AlertEntityCopyWithImpl<$Res, $Val extends AlertEntity>
     Object? visible = null,
     Object? scope = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      emoji: null == emoji
-          ? _value.emoji
-          : emoji // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-      color: null == color
-          ? _value.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as Color,
-      duration: null == duration
-          ? _value.duration
-          : duration // ignore: cast_nullable_to_non_nullable
-              as double,
-      visible: null == visible
-          ? _value.visible
-          : visible // ignore: cast_nullable_to_non_nullable
-              as bool,
-      scope: freezed == scope
-          ? _value.scope
-          : scope // ignore: cast_nullable_to_non_nullable
-              as AlertScope?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as int,
+            emoji: null == emoji
+                ? _value.emoji
+                : emoji // ignore: cast_nullable_to_non_nullable
+                      as String,
+            message: null == message
+                ? _value.message
+                : message // ignore: cast_nullable_to_non_nullable
+                      as String,
+            color: null == color
+                ? _value.color
+                : color // ignore: cast_nullable_to_non_nullable
+                      as Color,
+            duration: null == duration
+                ? _value.duration
+                : duration // ignore: cast_nullable_to_non_nullable
+                      as double,
+            visible: null == visible
+                ? _value.visible
+                : visible // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            scope: freezed == scope
+                ? _value.scope
+                : scope // ignore: cast_nullable_to_non_nullable
+                      as AlertScope?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -109,18 +115,20 @@ class _$AlertEntityCopyWithImpl<$Res, $Val extends AlertEntity>
 abstract class _$$AlertEntityImplCopyWith<$Res>
     implements $AlertEntityCopyWith<$Res> {
   factory _$$AlertEntityImplCopyWith(
-          _$AlertEntityImpl value, $Res Function(_$AlertEntityImpl) then) =
-      __$$AlertEntityImplCopyWithImpl<$Res>;
+    _$AlertEntityImpl value,
+    $Res Function(_$AlertEntityImpl) then,
+  ) = __$$AlertEntityImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {int id,
-      String emoji,
-      String message,
-      @ColorConverter() Color color,
-      double duration,
-      bool visible,
-      AlertScope? scope});
+  $Res call({
+    int id,
+    String emoji,
+    String message,
+    @ColorConverter() Color color,
+    double duration,
+    bool visible,
+    AlertScope? scope,
+  });
 }
 
 /// @nodoc
@@ -128,8 +136,9 @@ class __$$AlertEntityImplCopyWithImpl<$Res>
     extends _$AlertEntityCopyWithImpl<$Res, _$AlertEntityImpl>
     implements _$$AlertEntityImplCopyWith<$Res> {
   __$$AlertEntityImplCopyWithImpl(
-      _$AlertEntityImpl _value, $Res Function(_$AlertEntityImpl) _then)
-      : super(_value, _then);
+    _$AlertEntityImpl _value,
+    $Res Function(_$AlertEntityImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -142,50 +151,53 @@ class __$$AlertEntityImplCopyWithImpl<$Res>
     Object? visible = null,
     Object? scope = freezed,
   }) {
-    return _then(_$AlertEntityImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      emoji: null == emoji
-          ? _value.emoji
-          : emoji // ignore: cast_nullable_to_non_nullable
-              as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-      color: null == color
-          ? _value.color
-          : color // ignore: cast_nullable_to_non_nullable
-              as Color,
-      duration: null == duration
-          ? _value.duration
-          : duration // ignore: cast_nullable_to_non_nullable
-              as double,
-      visible: null == visible
-          ? _value.visible
-          : visible // ignore: cast_nullable_to_non_nullable
-              as bool,
-      scope: freezed == scope
-          ? _value.scope
-          : scope // ignore: cast_nullable_to_non_nullable
-              as AlertScope?,
-    ));
+    return _then(
+      _$AlertEntityImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as int,
+        emoji: null == emoji
+            ? _value.emoji
+            : emoji // ignore: cast_nullable_to_non_nullable
+                  as String,
+        message: null == message
+            ? _value.message
+            : message // ignore: cast_nullable_to_non_nullable
+                  as String,
+        color: null == color
+            ? _value.color
+            : color // ignore: cast_nullable_to_non_nullable
+                  as Color,
+        duration: null == duration
+            ? _value.duration
+            : duration // ignore: cast_nullable_to_non_nullable
+                  as double,
+        visible: null == visible
+            ? _value.visible
+            : visible // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        scope: freezed == scope
+            ? _value.scope
+            : scope // ignore: cast_nullable_to_non_nullable
+                  as AlertScope?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$AlertEntityImpl implements _AlertEntity {
-  const _$AlertEntityImpl(
-      {required this.id,
-      required this.emoji,
-      required this.message,
-      @ColorConverter() required this.color,
-      required this.duration,
-      required this.visible,
-      this.scope});
+  const _$AlertEntityImpl({
+    required this.id,
+    required this.emoji,
+    required this.message,
+    @ColorConverter() required this.color,
+    required this.duration,
+    required this.visible,
+    this.scope,
+  });
 
   factory _$AlertEntityImpl.fromJson(Map<String, dynamic> json) =>
       _$$AlertEntityImplFromJson(json);
@@ -229,7 +241,15 @@ class _$AlertEntityImpl implements _AlertEntity {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, emoji, message, color, duration, visible, scope);
+    runtimeType,
+    id,
+    emoji,
+    message,
+    color,
+    duration,
+    visible,
+    scope,
+  );
 
   @JsonKey(ignore: true)
   @override
@@ -239,21 +259,20 @@ class _$AlertEntityImpl implements _AlertEntity {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AlertEntityImplToJson(
-      this,
-    );
+    return _$$AlertEntityImplToJson(this);
   }
 }
 
 abstract class _AlertEntity implements AlertEntity {
-  const factory _AlertEntity(
-      {required final int id,
-      required final String emoji,
-      required final String message,
-      @ColorConverter() required final Color color,
-      required final double duration,
-      required final bool visible,
-      final AlertScope? scope}) = _$AlertEntityImpl;
+  const factory _AlertEntity({
+    required final int id,
+    required final String emoji,
+    required final String message,
+    @ColorConverter() required final Color color,
+    required final double duration,
+    required final bool visible,
+    final AlertScope? scope,
+  }) = _$AlertEntityImpl;
 
   factory _AlertEntity.fromJson(Map<String, dynamic> json) =
       _$AlertEntityImpl.fromJson;

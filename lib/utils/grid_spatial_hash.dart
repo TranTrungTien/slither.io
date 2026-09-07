@@ -59,7 +59,11 @@ class SpatialGrid<T> {
     _cells.clear();
   }
 
-  GridPoint<T>? nearest(Vector2 vector, double range, [bool Function(GridPoint<T>)? predicate]) {
+  GridPoint<T>? nearest(
+    Vector2 vector,
+    double range, [
+    bool Function(GridPoint<T>)? predicate,
+  ]) {
     final cellsInRange = _getCellsInRange(vector, range);
     GridPoint<T>? nearestPoint;
     double nearestDistance = range;
@@ -67,7 +71,8 @@ class SpatialGrid<T> {
     for (final cell in cellsInRange) {
       for (final point in cell.values) {
         final distance = vector.distanceTo(point.position);
-        if (distance < nearestDistance && (predicate == null || predicate(point))) {
+        if (distance < nearestDistance &&
+            (predicate == null || predicate(point))) {
           nearestPoint = point;
           nearestDistance = distance;
         }
@@ -76,13 +81,18 @@ class SpatialGrid<T> {
     return nearestPoint;
   }
 
-  List<GridPoint<T>> allWithin(Vector2 vector, double range, [bool Function(GridPoint<T>)? predicate]) {
+  List<GridPoint<T>> allWithin(
+    Vector2 vector,
+    double range, [
+    bool Function(GridPoint<T>)? predicate,
+  ]) {
     final cellsInRange = _getCellsInRange(vector, range);
     final List<GridPoint<T>> points = [];
 
     for (final cell in cellsInRange) {
       for (final point in cell.values) {
-        if (vector.distanceToSquared(point.position) <= range * range && (predicate == null || predicate(point))) {
+        if (vector.distanceToSquared(point.position) <= range * range &&
+            (predicate == null || predicate(point))) {
           points.add(point);
         }
       }
@@ -90,9 +100,12 @@ class SpatialGrid<T> {
     return points;
   }
 
-  List<GridPoint<T>> allWithinRect(Rect rect, [bool Function(GridPoint<T>)? predicate]) {
+  List<GridPoint<T>> allWithinRect(
+    Rect rect, [
+    bool Function(GridPoint<T>)? predicate,
+  ]) {
     final List<GridPoint<T>> points = [];
-    
+
     final int minX = (rect.left / resolution).floor();
     final int maxX = (rect.right / resolution).ceil();
     final int minY = (rect.top / resolution).floor();

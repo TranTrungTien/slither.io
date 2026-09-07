@@ -11,7 +11,8 @@ class PlayerData with _$PlayerData {
     required String skin,
   }) = _PlayerData;
 
-  factory PlayerData.fromJson(Map<String, dynamic> json) => _$PlayerDataFromJson(json);
+  factory PlayerData.fromJson(Map<String, dynamic> json) =>
+      _$PlayerDataFromJson(json);
 
   static const String randomSkin = "__random__";
 

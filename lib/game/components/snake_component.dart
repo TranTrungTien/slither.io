@@ -41,13 +41,13 @@ class SnakeComponent extends Component {
     final primaryColor = skin.primary ?? CatppuccinColors.mauve;
 
     _bodyPaint.color = primaryColor;
-    _bodyPaint.strokeWidth = radius * 2.1; 
+    _bodyPaint.strokeWidth = radius * 2.1;
     _headPaint.color = primaryColor;
 
     // LOD Optimization
     final double spacing = description.spacingAtHead;
     final int renderStep = math.max(1, (radius * 0.8 / spacing).floor());
-    
+
     _pointCount = 0;
 
     for (int i = entity.tracers.length - 1; i >= 0; i -= renderStep) {
@@ -55,7 +55,7 @@ class SnakeComponent extends Component {
       final pos = entity.tracers[i];
       _pointBuffer[_pointCount * 2] = pos.x;
       _pointBuffer[_pointCount * 2 + 1] = pos.y;
-      
+
       // Pre-calculate highlight offset to avoid loop inside drawing
       _highlightBuffer[_pointCount * 2] = pos.x - radius * 0.2;
       _highlightBuffer[_pointCount * 2 + 1] = pos.y - radius * 0.2;
@@ -65,28 +65,30 @@ class SnakeComponent extends Component {
 
     if (_pointCount > 0) {
       final points = Float32List.sublistView(_pointBuffer, 0, _pointCount * 2);
-      
+
       _shadowPaint.color = Colors.black.withAlpha(30);
       _shadowPaint.strokeWidth = radius * 2.3;
       canvas.drawRawPoints(ui.PointMode.points, points, _shadowPaint);
 
       canvas.drawRawPoints(ui.PointMode.points, points, _bodyPaint);
-      
+
       if (entity.id == 'local_player' || radius > 40) {
         _highlightPaint.color = Colors.white.withAlpha(25);
         _highlightPaint.strokeWidth = radius * 0.9;
         canvas.drawRawPoints(
-          ui.PointMode.points, 
-          Float32List.sublistView(_highlightBuffer, 0, _pointCount * 2), 
-          _highlightPaint
+          ui.PointMode.points,
+          Float32List.sublistView(_highlightBuffer, 0, _pointCount * 2),
+          _highlightPaint,
         );
       }
     }
 
     final headPos = Offset(entity.head.x, entity.head.y);
-    
-    _headGlowPaint.color = primaryColor.withAlpha(60);
-    _headGlowPaint.maskFilter = const MaskFilter.blur(BlurStyle.normal, 15.0);
+
+    _headGlowPaint.color = primaryColor.withAlpha(15);
+    canvas.drawCircle(headPos, radius * 2.8, _headGlowPaint);
+
+    _headGlowPaint.color = primaryColor.withAlpha(30);
     canvas.drawCircle(headPos, radius * 2.0, _headGlowPaint);
 
     canvas.drawCircle(headPos, radius * 1.2, _headPaint);
@@ -99,7 +101,7 @@ class SnakeComponent extends Component {
     final angle = entity.angle;
     final cosA = math.cos(angle);
     final sinA = math.sin(angle);
-    
+
     final fx = cosA * radius * 0.7;
     final fy = sinA * radius * 0.7;
     final rx = -sinA * radius * 0.55;
@@ -115,7 +117,15 @@ class SnakeComponent extends Component {
 
     final px = cosA * radius * 0.08;
     final py = sinA * radius * 0.08;
-    canvas.drawCircle(Offset(leftEyeX + px, leftEyeY + py), radius * 0.18, _pupilPaint);
-    canvas.drawCircle(Offset(rightEyeX + px, rightEyeY + py), radius * 0.18, _pupilPaint);
+    canvas.drawCircle(
+      Offset(leftEyeX + px, leftEyeY + py),
+      radius * 0.18,
+      _pupilPaint,
+    );
+    canvas.drawCircle(
+      Offset(rightEyeX + px, rightEyeY + py),
+      radius * 0.18,
+      _pupilPaint,
+    );
   }
 }

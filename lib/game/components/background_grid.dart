@@ -13,7 +13,7 @@ class BackgroundGrid extends Component with HasGameReference {
 
   static Path _getHexagonPath(double radius) {
     if (_hexagonPath != null) return _hexagonPath!;
-    
+
     final Path path = Path();
     for (int i = 0; i < 6; i++) {
       double angle = (math.pi / 180) * (60 * i - 30);
@@ -33,7 +33,7 @@ class BackgroundGrid extends Component with HasGameReference {
   @override
   void render(Canvas canvas) {
     final viewport = game.camera.visibleWorldRect;
-    
+
     const double radius = 60.0;
     final double width = math.sqrt(3) * radius;
     final double height = 2 * radius;
@@ -50,13 +50,13 @@ class BackgroundGrid extends Component with HasGameReference {
     for (int row = startRow; row <= endRow; row++) {
       final double rowY = row * verticalSpacing;
       final bool isOdd = row % 2 != 0;
-      
+
       for (int col = startCol; col <= endCol; col++) {
         double x = col * horizontalSpacing;
         if (isOdd) {
           x += horizontalSpacing / 2;
         }
-        
+
         canvas.save();
         canvas.translate(x, rowY);
         canvas.drawPath(path, _gridPaint);

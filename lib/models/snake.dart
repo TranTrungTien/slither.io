@@ -35,10 +35,12 @@ class SnakeEntity with _$SnakeEntity {
     required int eliminations,
     @Default(0.0) double boostTimer,
     @Vector2Converter() Vector2? previousDropPosition,
-    @JsonKey(includeFromJson: false, includeToJson: false) SnakeDescription? cachedDescription,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    SnakeDescription? cachedDescription,
   }) = _SnakeEntity;
 
-  factory SnakeEntity.fromJson(Map<String, dynamic> json) => _$SnakeEntityFromJson(json);
+  factory SnakeEntity.fromJson(Map<String, dynamic> json) =>
+      _$SnakeEntityFromJson(json);
 
   bool get isBoosting => boost && score > 10;
 
@@ -48,17 +50,25 @@ class SnakeEntity with _$SnakeEntity {
     }
 
     // Slightly smaller base radius and more gradual scaling
-    final radius = math.max(0.6 * (math.log(score / 150.0 + 2.0) / math.ln10), 0.4) * 50.0;
-    
+    final radius =
+        math.max(0.6 * (math.log(score / 150.0 + 2.0) / math.ln10), 0.4) * 50.0;
+
     // More linear length scaling for lower scores to make early growth feel better
-    final double length = (120.0 * (math.log(score / 300.0 + 1.0) / math.ln10) + 15.0) * 4.0;
-    
+    final double length =
+        (120.0 * (math.log(score / 300.0 + 1.0) / math.ln10) + 15.0) * 4.0;
+
     return SnakeDescription(
       radius: radius,
       spacingAtHead: 0.12 * radius,
       spacingAtTail: 0.14 * radius,
       length: length,
-      turnSpeed: (math.max(380.0 - 110.0 * (math.log(score / 180.0 + 1.0) / math.ln10), 55.0) * math.pi / 180.0),
+      turnSpeed:
+          (math.max(
+            380.0 - 110.0 * (math.log(score / 180.0 + 1.0) / math.ln10),
+            55.0,
+          ) *
+          math.pi /
+          180.0),
     );
   }
 }

@@ -18,5 +18,6 @@ class SnakeSkin with _$SnakeSkin {
     required int price,
   }) = _SnakeSkin;
 
-  factory SnakeSkin.fromJson(Map<String, dynamic> json) => _$SnakeSkinFromJson(json);
+  factory SnakeSkin.fromJson(Map<String, dynamic> json) =>
+      _$SnakeSkinFromJson(json);
 }

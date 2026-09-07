@@ -22,7 +22,8 @@ import 'components/background_grid.dart';
 import 'systems/collision_system.dart';
 import 'systems/bot_ai.dart';
 
-class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, KeyboardEvents {
+class SlitherGame extends FlameGame
+    with PanDetector, MouseMovementDetector, KeyboardEvents {
   final WidgetRef ref;
   final CollisionSystem _collisionSystem = CollisionSystem();
   final Map<String, BotAI> _botAIs = {};
@@ -38,6 +39,7 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   double _uiTimer = 0.0;
 
   static const int minSnakes = 20;
+  static int _candyIdCounter = 0;
   int? _lastRank;
   double _syncTimer = 0.0;
 
@@ -65,19 +67,22 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   void spawnPlayer() {
-    ref.read(snakeProvider.notifier).addSnake(
-      'local_player',
-      name: 'Player',
-      head: Vector2.zero(),
-      skin: SkinPresets.allSkins[3].id, // Mauve
-    );
+    ref
+        .read(snakeProvider.notifier)
+        .addSnake(
+          'local_player',
+          name: 'Player',
+          head: Vector2.zero(),
+          skin: SkinPresets.allSkins[3].id, // Mauve
+        );
   }
 
   void _maintainBots(Map<String, SnakeEntity> snakes) {
     if (snakes.length < minSnakes) {
       final random = math.Random();
       final id = const Uuid().v4();
-      final skin = SkinPresets.allSkins[random.nextInt(SkinPresets.allSkins.length)];
+      final skin =
+          SkinPresets.allSkins[random.nextInt(SkinPresets.allSkins.length)];
 
       // Spawn bots far from the player at (0,0)
       double posX, posY;
@@ -86,12 +91,14 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
         posY = (random.nextDouble() * 2 - 1) * GameConstants.worldBounds * 0.9;
       } while (math.sqrt(posX * posX + posY * posY) < 500);
 
-      ref.read(snakeProvider.notifier).addSnake(
-        id,
-        name: 'Bot ${random.nextInt(1000)}',
-        head: Vector2(posX, posY),
-        skin: skin.id,
-      );
+      ref
+          .read(snakeProvider.notifier)
+          .addSnake(
+            id,
+            name: 'Bot ${random.nextInt(1000)}',
+            head: Vector2(posX, posY),
+            skin: skin.id,
+          );
       _botAIs[id] = BotAI(id);
     }
   }
@@ -123,15 +130,26 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       );
     }
 
-    ref.read(snakeProvider.notifier).updateTick(dt, onBoostDrop: (pos, amount) {
-      ref.read(candyProvider.notifier).addCandy(CandyEntity(
-       id: 'drop_${const Uuid().v4()}',
-       size: amount,
-       position: pos,
-       color: CatppuccinColors.surface2,
-       type: CandyType.dropping,
-      ));
-    });
+    final pendingDrops = <CandyEntity>[];
+    ref
+        .read(snakeProvider.notifier)
+        .updateTick(
+          dt,
+          onBoostDrop: (pos, amount) {
+            pendingDrops.add(
+              CandyEntity(
+                id: 'drop_${_candyIdCounter++}',
+                size: amount,
+                position: pos.clone(),
+                color: CatppuccinColors.surface2,
+                type: CandyType.dropping,
+              ),
+            );
+          },
+        );
+    if (pendingDrops.isNotEmpty) {
+      ref.read(candyProvider.notifier).populateCandy(pendingDrops);
+    }
 
     final updatedSnakes = ref.read(snakeProvider);
     final updatedCandies = ref.read(candyProvider);
@@ -152,12 +170,14 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       onSnakeCollision: (victimId, killerId) {
         ref.read(snakeProvider.notifier).incrementEliminations(killerId);
         if (killerId == 'local_player') {
-         ref.read(alertProvider.notifier).sendAlert(
-           emoji: '🔥',
-           message: 'ELIMINATED BOT',
-           color: CatppuccinColors.red,
-         );
-         AudioService.play(SlitherSound.alertMoney);
+          ref
+              .read(alertProvider.notifier)
+              .sendAlert(
+                emoji: '🔥',
+                message: 'ELIMINATED BOT',
+                color: CatppuccinColors.red,
+              );
+          AudioService.play(SlitherSound.alertMoney);
         }
         _handleSnakeDeath(victimId);
       },
@@ -166,9 +186,10 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     // Sync components: Snakes every frame
     _syncSnakes(updatedSnakes);
     _candyLayer.updateCandies(updatedCandies);
-    
+
     _syncTimer += dt;
-    if (_syncTimer >= 0.5) { // Slower rank sync
+    if (_syncTimer >= 0.5) {
+      // Slower rank sync
       _syncTimer = 0.0;
       _updateRank(updatedSnakes);
     }
@@ -187,9 +208,10 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       final description = localSnake.describe();
       // Reduced zoom to see more of the world
       final double targetZoom = 1.4 / (description.radius * 0.02 + 1.0);
-      
+
       // Smoothly interpolate zoom
-      camera.viewfinder.zoom += (targetZoom - camera.viewfinder.zoom) * dt * 1.5;
+      camera.viewfinder.zoom +=
+          (targetZoom - camera.viewfinder.zoom) * dt * 1.5;
     }
   }
 
@@ -214,12 +236,16 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     final tracers = snake.tracers;
 
     for (final tracer in tracers) {
-      if (lastTracer != null && tracer.distanceTo(lastTracer) < 0.25 * tracerRadius * 10.0) {
+      if (lastTracer != null &&
+          tracer.distanceTo(lastTracer) < 0.25 * tracerRadius * 10.0) {
         continue;
       }
       lastTracer = tracer;
 
-      final int amount = (random.nextDouble() * math.max((tracerRadius * 10.0) / 5.0, 1.0)).round() + 1;
+      final int amount =
+          (random.nextDouble() * math.max((tracerRadius * 10.0) / 5.0, 1.0))
+              .round() +
+          1;
       for (int i = 0; i < amount; i++) {
         final x = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
         final y = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
@@ -228,7 +254,10 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     }
 
     if (lastTracer != null) {
-      final headAmount = (random.nextDouble() * math.max((tracerRadius * 10.0) / 5.0, 1.0)).round() + 1;
+      final headAmount =
+          (random.nextDouble() * math.max((tracerRadius * 10.0) / 5.0, 1.0))
+              .round() +
+          1;
       for (int i = 0; i < headAmount; i++) {
         final x = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
         final y = (random.nextDouble() * 2 - 1) * tracerRadius * 10.0;
@@ -236,13 +265,17 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
       }
     }
 
-    final double sum = math.min(8000 * (math.log(snake.score / 3000.0 + 1.0) / math.ln10), snake.score.toDouble());
+    final double sum = math.min(
+      8000 * (math.log(snake.score / 3000.0 + 1.0) / math.ln10),
+      snake.score.toDouble(),
+    );
     final int total = candyPositions.length;
-    final int sizePerCandy = (total > 0) ? (sum / total).ceil().clamp(1, 100) : 1;
+    final int sizePerCandy = (total > 0)
+        ? (sum / total).ceil().clamp(1, 100)
+        : 1;
 
     final skin = SkinPresets.getById(snake.skin);
 
-    final uuid = const Uuid();
     for (int i = 0; i < candyPositions.length; i++) {
       final pos = candyPositions[i];
       Color color = skin.primary ?? CatppuccinColors.peach;
@@ -250,13 +283,15 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
         color = skin.tint[i % skin.tint.length];
       }
 
-      loot.add(CandyEntity(
-        id: 'loot_${uuid.v4()}',
-        size: sizePerCandy,
-        position: pos,
-        color: color,
-        type: CandyType.loot,
-      ));
+      loot.add(
+        CandyEntity(
+          id: 'loot_${_candyIdCounter++}',
+          size: sizePerCandy,
+          position: pos,
+          color: color,
+          type: CandyType.loot,
+        ),
+      );
     }
 
     ref.read(candyProvider.notifier).populateCandy(loot);
@@ -265,9 +300,12 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
 
   void _syncSnakes(Map<String, SnakeEntity> snakes) {
     final activeIds = snakes.keys.toSet();
-    _snakeComponents.keys.where((id) => !activeIds.contains(id)).toList().forEach((id) {
-       _snakeComponents.remove(id)?.removeFromParent();
-    });
+    _snakeComponents.keys
+        .where((id) => !activeIds.contains(id))
+        .toList()
+        .forEach((id) {
+          _snakeComponents.remove(id)?.removeFromParent();
+        });
 
     for (final snake in snakes.values) {
       final existing = _snakeComponents[snake.id];
@@ -285,32 +323,39 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
     final localSnake = snakes['local_player'];
     if (localSnake == null || localSnake.dead) return;
 
-    final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
+    final sortedSnakes = snakes.values.toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
     final rankIndex = sortedSnakes.indexWhere((s) => s.id == 'local_player');
     final rank = rankIndex != -1 ? rankIndex + 1 : null;
 
     if (rank != null && _lastRank != null && rank < _lastRank!) {
       if (rank == 1) {
-        ref.read(alertProvider.notifier).sendAlert(
-          emoji: '🏆',
-          message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
-          color: CatppuccinColors.yellow,
-          scope: AlertScope.ranking,
-        );
+        ref
+            .read(alertProvider.notifier)
+            .sendAlert(
+              emoji: '🏆',
+              message: 'CONGRATULATIONS! YOU ARE IN FIRST PLACE',
+              color: CatppuccinColors.yellow,
+              scope: AlertScope.ranking,
+            );
       } else if (rank <= 3) {
-        ref.read(alertProvider.notifier).sendAlert(
-          emoji: '🥈',
-          message: 'CONGRATULATIONS! YOU ARE IN TOP 3',
-          color: CatppuccinColors.sapphire,
-          scope: AlertScope.ranking,
-        );
+        ref
+            .read(alertProvider.notifier)
+            .sendAlert(
+              emoji: '🥈',
+              message: 'CONGRATULATIONS! YOU ARE IN TOP 3',
+              color: CatppuccinColors.sapphire,
+              scope: AlertScope.ranking,
+            );
       } else {
-        ref.read(alertProvider.notifier).sendAlert(
-          emoji: '📈',
-          message: 'RANK UP: #$rank',
-          color: CatppuccinColors.blue,
-          scope: AlertScope.ranking,
-        );
+        ref
+            .read(alertProvider.notifier)
+            .sendAlert(
+              emoji: '📈',
+              message: 'RANK UP: #$rank',
+              color: CatppuccinColors.blue,
+              scope: AlertScope.ranking,
+            );
       }
       AudioService.play(SlitherSound.alertNeutral);
     }
@@ -318,7 +363,10 @@ class SlitherGame extends FlameGame with PanDetector, MouseMovementDetector, Key
   }
 
   @override
-  KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
     if (event is KeyRepeatEvent) return KeyEventResult.ignored;
 
     final isSpace = keysPressed.contains(LogicalKeyboardKey.space);

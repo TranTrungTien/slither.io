@@ -31,7 +31,8 @@ const Set<String> binaryExtensions = {
   '.mp3', '.wav', '.ogg', '.flac',
   '.ttf', '.otf',
   '.zip', '.tar', '.gz',
-  '.atlas', '.json', // Với game, bỏ qua json/atlas nếu quá lớn (có thể bỏ khỏi set này nếu muốn đọc)
+  '.atlas',
+  '.json', // Với game, bỏ qua json/atlas nếu quá lớn (có thể bỏ khỏi set này nếu muốn đọc)
 };
 
 void main() async {
@@ -70,7 +71,9 @@ void main() async {
 
   await outputFile.writeAsString(buffer.toString());
   stopwatch.stop();
-  print('Success: Exported context to ${outputFile.path} in ${stopwatch.elapsedMilliseconds}ms');
+  print(
+    'Success: Exported context to ${outputFile.path} in ${stopwatch.elapsedMilliseconds}ms',
+  );
 }
 
 void _buildTree(Directory dir, String indent, StringBuffer buffer) {
@@ -79,8 +82,7 @@ void _buildTree(Directory dir, String indent, StringBuffer buffer) {
     if (entity is Directory && excludedDirectories.contains(name)) return false;
     if (entity is File && _isExcludedFile(name)) return false;
     return true;
-  }).toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  }).toList()..sort((a, b) => a.path.compareTo(b.path));
 
   for (var i = 0; i < entities.length; i++) {
     final entity = entities[i];

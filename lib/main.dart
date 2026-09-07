@@ -8,9 +8,5 @@ void main() async {
 
   await Hive.initFlutter();
 
-  runApp(
-    const ProviderScope(
-      child: SlitherApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: SlitherApp()));
 }

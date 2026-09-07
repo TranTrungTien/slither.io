@@ -32,10 +32,7 @@ class DeathOverlay extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Final Score: $finalScore',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 24),
             ),
             const SizedBox(height: 32),
             ElevatedButton(
@@ -43,8 +40,14 @@ class DeathOverlay extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: CatppuccinColors.mauve,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               child: const Text('PLAY AGAIN'),
             ),

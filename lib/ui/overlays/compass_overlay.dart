@@ -18,7 +18,8 @@ class CompassOverlay extends ConsumerWidget {
         final snakes = ref.read(snakeProvider);
         final localSnake = snakes['local_player'];
 
-        if (localSnake == null || localSnake.dead) return const SizedBox.shrink();
+        if (localSnake == null || localSnake.dead)
+          return const SizedBox.shrink();
 
         // Find leader
         SnakeEntity? leader;
@@ -30,10 +31,12 @@ class CompassOverlay extends ConsumerWidget {
           }
         }
 
-        if (leader == null || leader.id == 'local_player') return const SizedBox.shrink();
+        if (leader == null || leader.id == 'local_player')
+          return const SizedBox.shrink();
 
         final delta = leader.head - localSnake.head;
-        if (delta.length < 100) return const SizedBox.shrink(); // Hide if very close
+        if (delta.length < 100)
+          return const SizedBox.shrink(); // Hide if very close
 
         final angle = math.atan2(delta.y, delta.x);
 
@@ -44,9 +47,7 @@ class CompassOverlay extends ConsumerWidget {
               height: 300,
               child: Stack(
                 children: [
-                  Positioned.fill(
-                    child: _CompassRenderer(angle: angle),
-                  ),
+                  Positioned.fill(child: _CompassRenderer(angle: angle)),
                 ],
               ),
             ),
@@ -68,20 +69,14 @@ class _CompassRenderer extends StatelessWidget {
       children: [
         // Crown at the edge
         Transform.translate(
-          offset: Offset(
-            math.cos(angle) * 120,
-            math.sin(angle) * 120,
-          ),
+          offset: Offset(math.cos(angle) * 120, math.sin(angle) * 120),
           child: const Center(
             child: Text('👑', style: TextStyle(fontSize: 32)),
           ),
         ),
         // Pointer arrow
         Transform.translate(
-          offset: Offset(
-            math.cos(angle) * 90,
-            math.sin(angle) * 90,
-          ),
+          offset: Offset(math.cos(angle) * 90, math.sin(angle) * 90),
           child: Center(
             child: Transform.rotate(
               angle: angle + math.pi / 2,

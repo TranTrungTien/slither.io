@@ -12,9 +12,25 @@ class SkinPresets {
     _franceSkin,
   ];
 
+  static final Map<String, SnakeSkin> _skinMap = {
+    for (final skin in allSkins) skin.id: skin,
+  };
+
   static final List<SnakeSkin> _catppuccinSkins = [
-    'rosewater', 'flamingo', 'pink', 'mauve', 'red', 'maroon', 'peach',
-    'yellow', 'green', 'teal', 'sky', 'sapphire', 'blue', 'lavender'
+    'rosewater',
+    'flamingo',
+    'pink',
+    'mauve',
+    'red',
+    'maroon',
+    'peach',
+    'yellow',
+    'green',
+    'teal',
+    'sky',
+    'sapphire',
+    'blue',
+    'lavender',
   ].map((id) => _createCatppuccinSkin(id, _getCatppuccinColor(id))).toList();
 
   static const Map<String, Color> _catppuccinColorMap = {
@@ -83,9 +99,17 @@ class SkinPresets {
     id: 'canada',
     price: 100,
     size: Vector2(512, 512),
-    tint: [CatppuccinColors.red, CatppuccinColors.white, CatppuccinColors.offwhite],
+    tint: [
+      CatppuccinColors.red,
+      CatppuccinColors.white,
+      CatppuccinColors.offwhite,
+    ],
     texture: ['snake_main', 'snake_canada', 'snake_main'],
-    boostTint: [CatppuccinColors.red, CatppuccinColors.red, CatppuccinColors.white],
+    boostTint: [
+      CatppuccinColors.red,
+      CatppuccinColors.red,
+      CatppuccinColors.white,
+    ],
   );
 
   static final SnakeSkin _ukSkin = SnakeSkin(
@@ -93,8 +117,12 @@ class SkinPresets {
     price: 100,
     size: Vector2(512, 512),
     tint: [
-      CatppuccinColors.red, CatppuccinColors.red, CatppuccinColors.offwhite,
-      CatppuccinColors.blue, CatppuccinColors.blue, CatppuccinColors.offwhite
+      CatppuccinColors.red,
+      CatppuccinColors.red,
+      CatppuccinColors.offwhite,
+      CatppuccinColors.blue,
+      CatppuccinColors.blue,
+      CatppuccinColors.offwhite,
     ],
     texture: ['snake_main'],
   );
@@ -104,14 +132,21 @@ class SkinPresets {
     price: 100,
     size: Vector2(512, 512),
     tint: [
-      CatppuccinColors.blue, CatppuccinColors.blue,
-      CatppuccinColors.offwhite, CatppuccinColors.offwhite,
-      CatppuccinColors.red, CatppuccinColors.red
+      CatppuccinColors.blue,
+      CatppuccinColors.blue,
+      CatppuccinColors.offwhite,
+      CatppuccinColors.offwhite,
+      CatppuccinColors.red,
+      CatppuccinColors.red,
     ],
     texture: ['snake_main'],
   );
 
-  static List<Color> _blendColorSequence(List<Color> colors, int length, {bool looped = true}) {
+  static List<Color> _blendColorSequence(
+    List<Color> colors,
+    int length, {
+    bool looped = true,
+  }) {
     final List<Color> result = [];
     final List<Color> workingColors = looped ? [...colors, colors[0]] : colors;
     final int colorCount = workingColors.length;
@@ -137,6 +172,6 @@ class SkinPresets {
   }
 
   static SnakeSkin getById(String id) {
-    return allSkins.firstWhere((s) => s.id == id, orElse: () => allSkins.first);
+    return _skinMap[id] ?? allSkins.first;
   }
 }

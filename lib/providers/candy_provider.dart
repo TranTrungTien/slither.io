@@ -39,20 +39,20 @@ class CandyNotifier extends StateNotifier<Map<String, CandyEntity>> {
 
     for (int i = 0; i < amount; i++) {
       final double angle = random.nextDouble() * 2 * math.pi;
-      final double dist = math.sqrt(random.nextDouble()) * GameConstants.worldBounds;
-      
-      final pos = Vector2(
-        math.cos(angle) * dist,
-        math.sin(angle) * dist,
-      );
+      final double dist =
+          math.sqrt(random.nextDouble()) * GameConstants.worldBounds;
 
-      newCandies.add(CandyEntity(
-        id: 'candy_${DateTime.now().microsecondsSinceEpoch}_$i',
-        size: random.nextInt(5) + 1,
-        position: pos,
-        color: _getRandomColor(random),
-        type: CandyType.defaultType,
-      ));
+      final pos = Vector2(math.cos(angle) * dist, math.sin(angle) * dist);
+
+      newCandies.add(
+        CandyEntity(
+          id: 'candy_${DateTime.now().microsecondsSinceEpoch}_$i',
+          size: random.nextInt(5) + 1,
+          position: pos,
+          color: _getRandomColor(random),
+          type: CandyType.defaultType,
+        ),
+      );
     }
     populateCandy(newCandies);
   }
@@ -73,6 +73,7 @@ class CandyNotifier extends StateNotifier<Map<String, CandyEntity>> {
   }
 }
 
-final candyProvider = StateNotifierProvider<CandyNotifier, Map<String, CandyEntity>>((ref) {
-  return CandyNotifier();
-});
+final candyProvider =
+    StateNotifierProvider<CandyNotifier, Map<String, CandyEntity>>((ref) {
+      return CandyNotifier();
+    });

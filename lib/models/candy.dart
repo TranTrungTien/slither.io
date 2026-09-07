@@ -5,11 +5,7 @@ import 'vector2_serde.dart';
 part 'candy.freezed.dart';
 part 'candy.g.dart';
 
-enum CandyType {
-  defaultType,
-  loot,
-  dropping,
-}
+enum CandyType { defaultType, loot, dropping }
 
 @freezed
 class CandyEntity with _$CandyEntity {
@@ -22,5 +18,6 @@ class CandyEntity with _$CandyEntity {
     @Vector2Converter() Vector2? eatenAt,
   }) = _CandyEntity;
 
-  factory CandyEntity.fromJson(Map<String, dynamic> json) => _$CandyEntityFromJson(json);
+  factory CandyEntity.fromJson(Map<String, dynamic> json) =>
+      _$CandyEntityFromJson(json);
 }

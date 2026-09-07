@@ -15,7 +15,9 @@ class AlertsOverlay extends ConsumerWidget {
       left: 0,
       right: 0,
       child: Column(
-        children: alerts.map((alert) => _AlertItem(key: ValueKey(alert.id), alert: alert)).toList(),
+        children: alerts
+            .map((alert) => _AlertItem(key: ValueKey(alert.id), alert: alert))
+            .toList(),
       ),
     );
   }
@@ -29,7 +31,8 @@ class _AlertItem extends StatefulWidget {
   State<_AlertItem> createState() => _AlertItemState();
 }
 
-class _AlertItemState extends State<_AlertItem> with SingleTickerProviderStateMixin {
+class _AlertItemState extends State<_AlertItem>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _slideAnimation;
 

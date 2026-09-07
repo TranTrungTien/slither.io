@@ -7,10 +7,7 @@ import '../../utils/grid_spatial_hash.dart';
 
 // Ported from: src/server/bots/bot-behavior.ts
 
-enum BehaviorMode {
-  idle,
-  scavenging,
-}
+enum BehaviorMode { idle, scavenging }
 
 class BotAI {
   final String id;
@@ -62,7 +59,8 @@ class BotAI {
     }
 
     final range = _random.nextDouble() > 0.2 ? 20.0 : 180.0;
-    final turnAmount = (_random.nextDouble() * 2 - 1) * range * (math.pi / 180.0);
+    final turnAmount =
+        (_random.nextDouble() * 2 - 1) * range * (math.pi / 180.0);
     onTurn(id, snake.angle + turnAmount);
   }
 
@@ -74,7 +72,7 @@ class BotAI {
   ) {
     // Spatial grid nearest is much faster than iterating all candies
     final nearestCandyPoint = candyGrid.nearest(snake.head, 400.0);
-    
+
     if (nearestCandyPoint == null) {
       _idle(snake, onTurn);
       return;
@@ -87,16 +85,29 @@ class BotAI {
     onTurn(id, angle);
   }
 
-  void _flee(SnakeEntity snake, Vector2 enemyDirection, void Function(String id, double angle) onTurn) {
-    final angle = math.atan2(enemyDirection.y, enemyDirection.x) + math.pi + (_random.nextDouble() * 2 - 1) * 0.2;
+  void _flee(
+    SnakeEntity snake,
+    Vector2 enemyDirection,
+    void Function(String id, double angle) onTurn,
+  ) {
+    final angle =
+        math.atan2(enemyDirection.y, enemyDirection.x) +
+        math.pi +
+        (_random.nextDouble() * 2 - 1) * 0.2;
     onTurn(id, angle);
   }
 
-  Vector2? _directionToNearestEnemy(SnakeEntity snake, Map<String, SnakeEntity> snakes, SpatialGrid<String> snakeGrid) {
+  Vector2? _directionToNearestEnemy(
+    SnakeEntity snake,
+    Map<String, SnakeEntity> snakes,
+    SpatialGrid<String> snakeGrid,
+  ) {
     final description = snake.describe();
     final radius = description.radius * 1.5;
 
-    final nearestPoint = snakeGrid.nearest(snake.head, radius * 8.0 + 50.0, (point) {
+    final nearestPoint = snakeGrid.nearest(snake.head, radius * 8.0 + 50.0, (
+      point,
+    ) {
       return point.metadata != snake.id;
     });
 
@@ -108,7 +119,7 @@ class BotAI {
     final dx = nearestPoint.position.x - snake.head.x;
     final dy = nearestPoint.position.y - snake.head.y;
     final distSq = dx * dx + dy * dy;
-    
+
     final enemyRadius = enemy.describe().radius;
     final alertDist = 5.0 * (radius + enemyRadius);
 

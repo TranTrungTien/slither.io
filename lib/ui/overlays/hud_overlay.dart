@@ -25,8 +25,9 @@ class HudOverlay extends ConsumerWidget {
             final localSnake = snakes['local_player'];
 
             // Compute ranking
-            final sortedSnakes = snakes.values.toList()..sort((a, b) => b.score.compareTo(a.score));
-            
+            final sortedSnakes = snakes.values.toList()
+              ..sort((a, b) => b.score.compareTo(a.score));
+
             final player = ref.read(playerProvider).value;
 
             final currentLength = localSnake?.describe().length.floor() ?? 0;
@@ -38,7 +39,10 @@ class HudOverlay extends ConsumerWidget {
                   bottom: 20,
                   left: 20,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black45,
                       borderRadius: BorderRadius.circular(5),
@@ -173,9 +177,7 @@ class _Leaderboard extends StatelessWidget {
     return Container(
       width: 200,
       padding: const EdgeInsets.all(8),
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
+      decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
@@ -214,9 +216,13 @@ class _Leaderboard extends StatelessWidget {
                       textAlign: TextAlign.right,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isLocal ? CatppuccinColors.mauve : Colors.white70,
+                        color: isLocal
+                            ? CatppuccinColors.mauve
+                            : Colors.white70,
                         fontSize: 12,
-                        fontWeight: isLocal ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isLocal
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ),

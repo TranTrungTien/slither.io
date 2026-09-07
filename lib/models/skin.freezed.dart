@@ -12,7 +12,8 @@ part of 'skin.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 SnakeSkin _$SnakeSkinFromJson(Map<String, dynamic> json) {
   return _SnakeSkin.fromJson(json);
@@ -45,15 +46,16 @@ abstract class $SnakeSkinCopyWith<$Res> {
   factory $SnakeSkinCopyWith(SnakeSkin value, $Res Function(SnakeSkin) then) =
       _$SnakeSkinCopyWithImpl<$Res, SnakeSkin>;
   @useResult
-  $Res call(
-      {String id,
-      @ColorConverter() Color? primary,
-      @ColorConverter() Color? secondary,
-      @ColorConverter() List<Color> tint,
-      @ColorConverter() List<Color>? boostTint,
-      List<String> texture,
-      @Vector2Converter() Vector2 size,
-      int price});
+  $Res call({
+    String id,
+    @ColorConverter() Color? primary,
+    @ColorConverter() Color? secondary,
+    @ColorConverter() List<Color> tint,
+    @ColorConverter() List<Color>? boostTint,
+    List<String> texture,
+    @Vector2Converter() Vector2 size,
+    int price,
+  });
 }
 
 /// @nodoc
@@ -78,40 +80,43 @@ class _$SnakeSkinCopyWithImpl<$Res, $Val extends SnakeSkin>
     Object? size = null,
     Object? price = null,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      primary: freezed == primary
-          ? _value.primary
-          : primary // ignore: cast_nullable_to_non_nullable
-              as Color?,
-      secondary: freezed == secondary
-          ? _value.secondary
-          : secondary // ignore: cast_nullable_to_non_nullable
-              as Color?,
-      tint: null == tint
-          ? _value.tint
-          : tint // ignore: cast_nullable_to_non_nullable
-              as List<Color>,
-      boostTint: freezed == boostTint
-          ? _value.boostTint
-          : boostTint // ignore: cast_nullable_to_non_nullable
-              as List<Color>?,
-      texture: null == texture
-          ? _value.texture
-          : texture // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      size: null == size
-          ? _value.size
-          : size // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      price: null == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            primary: freezed == primary
+                ? _value.primary
+                : primary // ignore: cast_nullable_to_non_nullable
+                      as Color?,
+            secondary: freezed == secondary
+                ? _value.secondary
+                : secondary // ignore: cast_nullable_to_non_nullable
+                      as Color?,
+            tint: null == tint
+                ? _value.tint
+                : tint // ignore: cast_nullable_to_non_nullable
+                      as List<Color>,
+            boostTint: freezed == boostTint
+                ? _value.boostTint
+                : boostTint // ignore: cast_nullable_to_non_nullable
+                      as List<Color>?,
+            texture: null == texture
+                ? _value.texture
+                : texture // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            size: null == size
+                ? _value.size
+                : size // ignore: cast_nullable_to_non_nullable
+                      as Vector2,
+            price: null == price
+                ? _value.price
+                : price // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -119,19 +124,21 @@ class _$SnakeSkinCopyWithImpl<$Res, $Val extends SnakeSkin>
 abstract class _$$SnakeSkinImplCopyWith<$Res>
     implements $SnakeSkinCopyWith<$Res> {
   factory _$$SnakeSkinImplCopyWith(
-          _$SnakeSkinImpl value, $Res Function(_$SnakeSkinImpl) then) =
-      __$$SnakeSkinImplCopyWithImpl<$Res>;
+    _$SnakeSkinImpl value,
+    $Res Function(_$SnakeSkinImpl) then,
+  ) = __$$SnakeSkinImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      @ColorConverter() Color? primary,
-      @ColorConverter() Color? secondary,
-      @ColorConverter() List<Color> tint,
-      @ColorConverter() List<Color>? boostTint,
-      List<String> texture,
-      @Vector2Converter() Vector2 size,
-      int price});
+  $Res call({
+    String id,
+    @ColorConverter() Color? primary,
+    @ColorConverter() Color? secondary,
+    @ColorConverter() List<Color> tint,
+    @ColorConverter() List<Color>? boostTint,
+    List<String> texture,
+    @Vector2Converter() Vector2 size,
+    int price,
+  });
 }
 
 /// @nodoc
@@ -139,8 +146,9 @@ class __$$SnakeSkinImplCopyWithImpl<$Res>
     extends _$SnakeSkinCopyWithImpl<$Res, _$SnakeSkinImpl>
     implements _$$SnakeSkinImplCopyWith<$Res> {
   __$$SnakeSkinImplCopyWithImpl(
-      _$SnakeSkinImpl _value, $Res Function(_$SnakeSkinImpl) _then)
-      : super(_value, _then);
+    _$SnakeSkinImpl _value,
+    $Res Function(_$SnakeSkinImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -154,58 +162,60 @@ class __$$SnakeSkinImplCopyWithImpl<$Res>
     Object? size = null,
     Object? price = null,
   }) {
-    return _then(_$SnakeSkinImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      primary: freezed == primary
-          ? _value.primary
-          : primary // ignore: cast_nullable_to_non_nullable
-              as Color?,
-      secondary: freezed == secondary
-          ? _value.secondary
-          : secondary // ignore: cast_nullable_to_non_nullable
-              as Color?,
-      tint: null == tint
-          ? _value._tint
-          : tint // ignore: cast_nullable_to_non_nullable
-              as List<Color>,
-      boostTint: freezed == boostTint
-          ? _value._boostTint
-          : boostTint // ignore: cast_nullable_to_non_nullable
-              as List<Color>?,
-      texture: null == texture
-          ? _value._texture
-          : texture // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      size: null == size
-          ? _value.size
-          : size // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      price: null == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$SnakeSkinImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        primary: freezed == primary
+            ? _value.primary
+            : primary // ignore: cast_nullable_to_non_nullable
+                  as Color?,
+        secondary: freezed == secondary
+            ? _value.secondary
+            : secondary // ignore: cast_nullable_to_non_nullable
+                  as Color?,
+        tint: null == tint
+            ? _value._tint
+            : tint // ignore: cast_nullable_to_non_nullable
+                  as List<Color>,
+        boostTint: freezed == boostTint
+            ? _value._boostTint
+            : boostTint // ignore: cast_nullable_to_non_nullable
+                  as List<Color>?,
+        texture: null == texture
+            ? _value._texture
+            : texture // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        size: null == size
+            ? _value.size
+            : size // ignore: cast_nullable_to_non_nullable
+                  as Vector2,
+        price: null == price
+            ? _value.price
+            : price // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$SnakeSkinImpl implements _SnakeSkin {
-  const _$SnakeSkinImpl(
-      {required this.id,
-      @ColorConverter() this.primary,
-      @ColorConverter() this.secondary,
-      @ColorConverter() required final List<Color> tint,
-      @ColorConverter() final List<Color>? boostTint,
-      required final List<String> texture,
-      @Vector2Converter() required this.size,
-      required this.price})
-      : _tint = tint,
-        _boostTint = boostTint,
-        _texture = texture;
+  const _$SnakeSkinImpl({
+    required this.id,
+    @ColorConverter() this.primary,
+    @ColorConverter() this.secondary,
+    @ColorConverter() required final List<Color> tint,
+    @ColorConverter() final List<Color>? boostTint,
+    required final List<String> texture,
+    @Vector2Converter() required this.size,
+    required this.price,
+  }) : _tint = tint,
+       _boostTint = boostTint,
+       _texture = texture;
 
   factory _$SnakeSkinImpl.fromJson(Map<String, dynamic> json) =>
       _$$SnakeSkinImplFromJson(json);
@@ -267,8 +277,10 @@ class _$SnakeSkinImpl implements _SnakeSkin {
             (identical(other.secondary, secondary) ||
                 other.secondary == secondary) &&
             const DeepCollectionEquality().equals(other._tint, _tint) &&
-            const DeepCollectionEquality()
-                .equals(other._boostTint, _boostTint) &&
+            const DeepCollectionEquality().equals(
+              other._boostTint,
+              _boostTint,
+            ) &&
             const DeepCollectionEquality().equals(other._texture, _texture) &&
             (identical(other.size, size) || other.size == size) &&
             (identical(other.price, price) || other.price == price));
@@ -277,15 +289,16 @@ class _$SnakeSkinImpl implements _SnakeSkin {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      primary,
-      secondary,
-      const DeepCollectionEquality().hash(_tint),
-      const DeepCollectionEquality().hash(_boostTint),
-      const DeepCollectionEquality().hash(_texture),
-      size,
-      price);
+    runtimeType,
+    id,
+    primary,
+    secondary,
+    const DeepCollectionEquality().hash(_tint),
+    const DeepCollectionEquality().hash(_boostTint),
+    const DeepCollectionEquality().hash(_texture),
+    size,
+    price,
+  );
 
   @JsonKey(ignore: true)
   @override
@@ -295,22 +308,21 @@ class _$SnakeSkinImpl implements _SnakeSkin {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SnakeSkinImplToJson(
-      this,
-    );
+    return _$$SnakeSkinImplToJson(this);
   }
 }
 
 abstract class _SnakeSkin implements SnakeSkin {
-  const factory _SnakeSkin(
-      {required final String id,
-      @ColorConverter() final Color? primary,
-      @ColorConverter() final Color? secondary,
-      @ColorConverter() required final List<Color> tint,
-      @ColorConverter() final List<Color>? boostTint,
-      required final List<String> texture,
-      @Vector2Converter() required final Vector2 size,
-      required final int price}) = _$SnakeSkinImpl;
+  const factory _SnakeSkin({
+    required final String id,
+    @ColorConverter() final Color? primary,
+    @ColorConverter() final Color? secondary,
+    @ColorConverter() required final List<Color> tint,
+    @ColorConverter() final List<Color>? boostTint,
+    required final List<String> texture,
+    @Vector2Converter() required final Vector2 size,
+    required final int price,
+  }) = _$SnakeSkinImpl;
 
   factory _SnakeSkin.fromJson(Map<String, dynamic> json) =
       _$SnakeSkinImpl.fromJson;

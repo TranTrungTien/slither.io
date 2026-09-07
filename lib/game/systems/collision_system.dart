@@ -21,12 +21,12 @@ class CollisionSystem {
 
       snakeGrid.insert(snake.head, snake.id);
       final tracers = snake.tracers;
-      
+
       // Only insert every Nth tracer
       for (int i = 0; i < tracers.length; i += tracerStep) {
         snakeGrid.insert(tracers[i], snake.id);
       }
-      
+
       if (tracers.isNotEmpty && (tracers.length - 1) % tracerStep != 0) {
         snakeGrid.insert(tracers.last, snake.id);
       }
@@ -41,7 +41,7 @@ class CollisionSystem {
         removedIds.add(id);
       }
     }
-    
+
     for (final id in removedIds) {
       final pos = _candyPositionCache.remove(id);
       if (pos != null) candyGrid.remove(pos);
@@ -82,12 +82,15 @@ class CollisionSystem {
       }
 
       // 1. Snake-to-Snake collision
-      final nearestEnemy = snakeGrid.nearest(snake.head, radius + 15.0, (point) {
+      final nearestEnemy = snakeGrid.nearest(snake.head, radius + 15.0, (
+        point,
+      ) {
         if (point.metadata == snake.id) {
           // Self collision only if far from head
           final dx = snake.head.x - point.position.x;
           final dy = snake.head.y - point.position.y;
-          return (dx * dx + dy * dy) > (radius * radius * 12.0); // 3.5 * radius approx
+          return (dx * dx + dy * dy) >
+              (radius * radius * 12.0); // 3.5 * radius approx
         }
         return true;
       });
@@ -99,7 +102,7 @@ class CollisionSystem {
           final dx = snake.head.x - nearestEnemy.position.x;
           final dy = snake.head.y - nearestEnemy.position.y;
           final distSq = dx * dx + dy * dy;
-          
+
           final collisionDist = 0.85 * (radius + enemyRadius);
 
           if (distSq <= collisionDist * collisionDist) {

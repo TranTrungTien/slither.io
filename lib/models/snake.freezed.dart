@@ -12,7 +12,8 @@ part of 'snake.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 /// @nodoc
 mixin _$SnakeDescription {
@@ -30,15 +31,17 @@ mixin _$SnakeDescription {
 /// @nodoc
 abstract class $SnakeDescriptionCopyWith<$Res> {
   factory $SnakeDescriptionCopyWith(
-          SnakeDescription value, $Res Function(SnakeDescription) then) =
-      _$SnakeDescriptionCopyWithImpl<$Res, SnakeDescription>;
+    SnakeDescription value,
+    $Res Function(SnakeDescription) then,
+  ) = _$SnakeDescriptionCopyWithImpl<$Res, SnakeDescription>;
   @useResult
-  $Res call(
-      {double length,
-      double radius,
-      double spacingAtHead,
-      double spacingAtTail,
-      double turnSpeed});
+  $Res call({
+    double length,
+    double radius,
+    double spacingAtHead,
+    double spacingAtTail,
+    double turnSpeed,
+  });
 }
 
 /// @nodoc
@@ -60,54 +63,60 @@ class _$SnakeDescriptionCopyWithImpl<$Res, $Val extends SnakeDescription>
     Object? spacingAtTail = null,
     Object? turnSpeed = null,
   }) {
-    return _then(_value.copyWith(
-      length: null == length
-          ? _value.length
-          : length // ignore: cast_nullable_to_non_nullable
-              as double,
-      radius: null == radius
-          ? _value.radius
-          : radius // ignore: cast_nullable_to_non_nullable
-              as double,
-      spacingAtHead: null == spacingAtHead
-          ? _value.spacingAtHead
-          : spacingAtHead // ignore: cast_nullable_to_non_nullable
-              as double,
-      spacingAtTail: null == spacingAtTail
-          ? _value.spacingAtTail
-          : spacingAtTail // ignore: cast_nullable_to_non_nullable
-              as double,
-      turnSpeed: null == turnSpeed
-          ? _value.turnSpeed
-          : turnSpeed // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            length: null == length
+                ? _value.length
+                : length // ignore: cast_nullable_to_non_nullable
+                      as double,
+            radius: null == radius
+                ? _value.radius
+                : radius // ignore: cast_nullable_to_non_nullable
+                      as double,
+            spacingAtHead: null == spacingAtHead
+                ? _value.spacingAtHead
+                : spacingAtHead // ignore: cast_nullable_to_non_nullable
+                      as double,
+            spacingAtTail: null == spacingAtTail
+                ? _value.spacingAtTail
+                : spacingAtTail // ignore: cast_nullable_to_non_nullable
+                      as double,
+            turnSpeed: null == turnSpeed
+                ? _value.turnSpeed
+                : turnSpeed // ignore: cast_nullable_to_non_nullable
+                      as double,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$SnakeDescriptionImplCopyWith<$Res>
     implements $SnakeDescriptionCopyWith<$Res> {
-  factory _$$SnakeDescriptionImplCopyWith(_$SnakeDescriptionImpl value,
-          $Res Function(_$SnakeDescriptionImpl) then) =
-      __$$SnakeDescriptionImplCopyWithImpl<$Res>;
+  factory _$$SnakeDescriptionImplCopyWith(
+    _$SnakeDescriptionImpl value,
+    $Res Function(_$SnakeDescriptionImpl) then,
+  ) = __$$SnakeDescriptionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {double length,
-      double radius,
-      double spacingAtHead,
-      double spacingAtTail,
-      double turnSpeed});
+  $Res call({
+    double length,
+    double radius,
+    double spacingAtHead,
+    double spacingAtTail,
+    double turnSpeed,
+  });
 }
 
 /// @nodoc
 class __$$SnakeDescriptionImplCopyWithImpl<$Res>
     extends _$SnakeDescriptionCopyWithImpl<$Res, _$SnakeDescriptionImpl>
     implements _$$SnakeDescriptionImplCopyWith<$Res> {
-  __$$SnakeDescriptionImplCopyWithImpl(_$SnakeDescriptionImpl _value,
-      $Res Function(_$SnakeDescriptionImpl) _then)
-      : super(_value, _then);
+  __$$SnakeDescriptionImplCopyWithImpl(
+    _$SnakeDescriptionImpl _value,
+    $Res Function(_$SnakeDescriptionImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -118,40 +127,43 @@ class __$$SnakeDescriptionImplCopyWithImpl<$Res>
     Object? spacingAtTail = null,
     Object? turnSpeed = null,
   }) {
-    return _then(_$SnakeDescriptionImpl(
-      length: null == length
-          ? _value.length
-          : length // ignore: cast_nullable_to_non_nullable
-              as double,
-      radius: null == radius
-          ? _value.radius
-          : radius // ignore: cast_nullable_to_non_nullable
-              as double,
-      spacingAtHead: null == spacingAtHead
-          ? _value.spacingAtHead
-          : spacingAtHead // ignore: cast_nullable_to_non_nullable
-              as double,
-      spacingAtTail: null == spacingAtTail
-          ? _value.spacingAtTail
-          : spacingAtTail // ignore: cast_nullable_to_non_nullable
-              as double,
-      turnSpeed: null == turnSpeed
-          ? _value.turnSpeed
-          : turnSpeed // ignore: cast_nullable_to_non_nullable
-              as double,
-    ));
+    return _then(
+      _$SnakeDescriptionImpl(
+        length: null == length
+            ? _value.length
+            : length // ignore: cast_nullable_to_non_nullable
+                  as double,
+        radius: null == radius
+            ? _value.radius
+            : radius // ignore: cast_nullable_to_non_nullable
+                  as double,
+        spacingAtHead: null == spacingAtHead
+            ? _value.spacingAtHead
+            : spacingAtHead // ignore: cast_nullable_to_non_nullable
+                  as double,
+        spacingAtTail: null == spacingAtTail
+            ? _value.spacingAtTail
+            : spacingAtTail // ignore: cast_nullable_to_non_nullable
+                  as double,
+        turnSpeed: null == turnSpeed
+            ? _value.turnSpeed
+            : turnSpeed // ignore: cast_nullable_to_non_nullable
+                  as double,
+      ),
+    );
   }
 }
 
 /// @nodoc
 
 class _$SnakeDescriptionImpl implements _SnakeDescription {
-  const _$SnakeDescriptionImpl(
-      {required this.length,
-      required this.radius,
-      required this.spacingAtHead,
-      required this.spacingAtTail,
-      required this.turnSpeed});
+  const _$SnakeDescriptionImpl({
+    required this.length,
+    required this.radius,
+    required this.spacingAtHead,
+    required this.spacingAtTail,
+    required this.turnSpeed,
+  });
 
   @override
   final double length;
@@ -186,23 +198,32 @@ class _$SnakeDescriptionImpl implements _SnakeDescription {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, length, radius, spacingAtHead, spacingAtTail, turnSpeed);
+    runtimeType,
+    length,
+    radius,
+    spacingAtHead,
+    spacingAtTail,
+    turnSpeed,
+  );
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SnakeDescriptionImplCopyWith<_$SnakeDescriptionImpl> get copyWith =>
       __$$SnakeDescriptionImplCopyWithImpl<_$SnakeDescriptionImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 }
 
 abstract class _SnakeDescription implements SnakeDescription {
-  const factory _SnakeDescription(
-      {required final double length,
-      required final double radius,
-      required final double spacingAtHead,
-      required final double spacingAtTail,
-      required final double turnSpeed}) = _$SnakeDescriptionImpl;
+  const factory _SnakeDescription({
+    required final double length,
+    required final double radius,
+    required final double spacingAtHead,
+    required final double spacingAtTail,
+    required final double turnSpeed,
+  }) = _$SnakeDescriptionImpl;
 
   @override
   double get length;
@@ -254,25 +275,27 @@ mixin _$SnakeEntity {
 /// @nodoc
 abstract class $SnakeEntityCopyWith<$Res> {
   factory $SnakeEntityCopyWith(
-          SnakeEntity value, $Res Function(SnakeEntity) then) =
-      _$SnakeEntityCopyWithImpl<$Res, SnakeEntity>;
+    SnakeEntity value,
+    $Res Function(SnakeEntity) then,
+  ) = _$SnakeEntityCopyWithImpl<$Res, SnakeEntity>;
   @useResult
-  $Res call(
-      {String id,
-      String name,
-      @Vector2Converter() Vector2 head,
-      double angle,
-      double desiredAngle,
-      int score,
-      bool boost,
-      @Vector2Converter() List<Vector2> tracers,
-      String skin,
-      bool dead,
-      int eliminations,
-      double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      SnakeDescription? cachedDescription});
+  $Res call({
+    String id,
+    String name,
+    @Vector2Converter() Vector2 head,
+    double angle,
+    double desiredAngle,
+    int score,
+    bool boost,
+    @Vector2Converter() List<Vector2> tracers,
+    String skin,
+    bool dead,
+    int eliminations,
+    double boostTimer,
+    @Vector2Converter() Vector2? previousDropPosition,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    SnakeDescription? cachedDescription,
+  });
 
   $SnakeDescriptionCopyWith<$Res>? get cachedDescription;
 }
@@ -305,64 +328,67 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
     Object? previousDropPosition = freezed,
     Object? cachedDescription = freezed,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      head: null == head
-          ? _value.head
-          : head // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      angle: null == angle
-          ? _value.angle
-          : angle // ignore: cast_nullable_to_non_nullable
-              as double,
-      desiredAngle: null == desiredAngle
-          ? _value.desiredAngle
-          : desiredAngle // ignore: cast_nullable_to_non_nullable
-              as double,
-      score: null == score
-          ? _value.score
-          : score // ignore: cast_nullable_to_non_nullable
-              as int,
-      boost: null == boost
-          ? _value.boost
-          : boost // ignore: cast_nullable_to_non_nullable
-              as bool,
-      tracers: null == tracers
-          ? _value.tracers
-          : tracers // ignore: cast_nullable_to_non_nullable
-              as List<Vector2>,
-      skin: null == skin
-          ? _value.skin
-          : skin // ignore: cast_nullable_to_non_nullable
-              as String,
-      dead: null == dead
-          ? _value.dead
-          : dead // ignore: cast_nullable_to_non_nullable
-              as bool,
-      eliminations: null == eliminations
-          ? _value.eliminations
-          : eliminations // ignore: cast_nullable_to_non_nullable
-              as int,
-      boostTimer: null == boostTimer
-          ? _value.boostTimer
-          : boostTimer // ignore: cast_nullable_to_non_nullable
-              as double,
-      previousDropPosition: freezed == previousDropPosition
-          ? _value.previousDropPosition
-          : previousDropPosition // ignore: cast_nullable_to_non_nullable
-              as Vector2?,
-      cachedDescription: freezed == cachedDescription
-          ? _value.cachedDescription
-          : cachedDescription // ignore: cast_nullable_to_non_nullable
-              as SnakeDescription?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            name: null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                      as String,
+            head: null == head
+                ? _value.head
+                : head // ignore: cast_nullable_to_non_nullable
+                      as Vector2,
+            angle: null == angle
+                ? _value.angle
+                : angle // ignore: cast_nullable_to_non_nullable
+                      as double,
+            desiredAngle: null == desiredAngle
+                ? _value.desiredAngle
+                : desiredAngle // ignore: cast_nullable_to_non_nullable
+                      as double,
+            score: null == score
+                ? _value.score
+                : score // ignore: cast_nullable_to_non_nullable
+                      as int,
+            boost: null == boost
+                ? _value.boost
+                : boost // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            tracers: null == tracers
+                ? _value.tracers
+                : tracers // ignore: cast_nullable_to_non_nullable
+                      as List<Vector2>,
+            skin: null == skin
+                ? _value.skin
+                : skin // ignore: cast_nullable_to_non_nullable
+                      as String,
+            dead: null == dead
+                ? _value.dead
+                : dead // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            eliminations: null == eliminations
+                ? _value.eliminations
+                : eliminations // ignore: cast_nullable_to_non_nullable
+                      as int,
+            boostTimer: null == boostTimer
+                ? _value.boostTimer
+                : boostTimer // ignore: cast_nullable_to_non_nullable
+                      as double,
+            previousDropPosition: freezed == previousDropPosition
+                ? _value.previousDropPosition
+                : previousDropPosition // ignore: cast_nullable_to_non_nullable
+                      as Vector2?,
+            cachedDescription: freezed == cachedDescription
+                ? _value.cachedDescription
+                : cachedDescription // ignore: cast_nullable_to_non_nullable
+                      as SnakeDescription?,
+          )
+          as $Val,
+    );
   }
 
   @override
@@ -382,26 +408,28 @@ class _$SnakeEntityCopyWithImpl<$Res, $Val extends SnakeEntity>
 abstract class _$$SnakeEntityImplCopyWith<$Res>
     implements $SnakeEntityCopyWith<$Res> {
   factory _$$SnakeEntityImplCopyWith(
-          _$SnakeEntityImpl value, $Res Function(_$SnakeEntityImpl) then) =
-      __$$SnakeEntityImplCopyWithImpl<$Res>;
+    _$SnakeEntityImpl value,
+    $Res Function(_$SnakeEntityImpl) then,
+  ) = __$$SnakeEntityImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String id,
-      String name,
-      @Vector2Converter() Vector2 head,
-      double angle,
-      double desiredAngle,
-      int score,
-      bool boost,
-      @Vector2Converter() List<Vector2> tracers,
-      String skin,
-      bool dead,
-      int eliminations,
-      double boostTimer,
-      @Vector2Converter() Vector2? previousDropPosition,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      SnakeDescription? cachedDescription});
+  $Res call({
+    String id,
+    String name,
+    @Vector2Converter() Vector2 head,
+    double angle,
+    double desiredAngle,
+    int score,
+    bool boost,
+    @Vector2Converter() List<Vector2> tracers,
+    String skin,
+    bool dead,
+    int eliminations,
+    double boostTimer,
+    @Vector2Converter() Vector2? previousDropPosition,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    SnakeDescription? cachedDescription,
+  });
 
   @override
   $SnakeDescriptionCopyWith<$Res>? get cachedDescription;
@@ -412,8 +440,9 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
     extends _$SnakeEntityCopyWithImpl<$Res, _$SnakeEntityImpl>
     implements _$$SnakeEntityImplCopyWith<$Res> {
   __$$SnakeEntityImplCopyWithImpl(
-      _$SnakeEntityImpl _value, $Res Function(_$SnakeEntityImpl) _then)
-      : super(_value, _then);
+    _$SnakeEntityImpl _value,
+    $Res Function(_$SnakeEntityImpl) _then,
+  ) : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
@@ -433,88 +462,90 @@ class __$$SnakeEntityImplCopyWithImpl<$Res>
     Object? previousDropPosition = freezed,
     Object? cachedDescription = freezed,
   }) {
-    return _then(_$SnakeEntityImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      head: null == head
-          ? _value.head
-          : head // ignore: cast_nullable_to_non_nullable
-              as Vector2,
-      angle: null == angle
-          ? _value.angle
-          : angle // ignore: cast_nullable_to_non_nullable
-              as double,
-      desiredAngle: null == desiredAngle
-          ? _value.desiredAngle
-          : desiredAngle // ignore: cast_nullable_to_non_nullable
-              as double,
-      score: null == score
-          ? _value.score
-          : score // ignore: cast_nullable_to_non_nullable
-              as int,
-      boost: null == boost
-          ? _value.boost
-          : boost // ignore: cast_nullable_to_non_nullable
-              as bool,
-      tracers: null == tracers
-          ? _value._tracers
-          : tracers // ignore: cast_nullable_to_non_nullable
-              as List<Vector2>,
-      skin: null == skin
-          ? _value.skin
-          : skin // ignore: cast_nullable_to_non_nullable
-              as String,
-      dead: null == dead
-          ? _value.dead
-          : dead // ignore: cast_nullable_to_non_nullable
-              as bool,
-      eliminations: null == eliminations
-          ? _value.eliminations
-          : eliminations // ignore: cast_nullable_to_non_nullable
-              as int,
-      boostTimer: null == boostTimer
-          ? _value.boostTimer
-          : boostTimer // ignore: cast_nullable_to_non_nullable
-              as double,
-      previousDropPosition: freezed == previousDropPosition
-          ? _value.previousDropPosition
-          : previousDropPosition // ignore: cast_nullable_to_non_nullable
-              as Vector2?,
-      cachedDescription: freezed == cachedDescription
-          ? _value.cachedDescription
-          : cachedDescription // ignore: cast_nullable_to_non_nullable
-              as SnakeDescription?,
-    ));
+    return _then(
+      _$SnakeEntityImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        name: null == name
+            ? _value.name
+            : name // ignore: cast_nullable_to_non_nullable
+                  as String,
+        head: null == head
+            ? _value.head
+            : head // ignore: cast_nullable_to_non_nullable
+                  as Vector2,
+        angle: null == angle
+            ? _value.angle
+            : angle // ignore: cast_nullable_to_non_nullable
+                  as double,
+        desiredAngle: null == desiredAngle
+            ? _value.desiredAngle
+            : desiredAngle // ignore: cast_nullable_to_non_nullable
+                  as double,
+        score: null == score
+            ? _value.score
+            : score // ignore: cast_nullable_to_non_nullable
+                  as int,
+        boost: null == boost
+            ? _value.boost
+            : boost // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        tracers: null == tracers
+            ? _value._tracers
+            : tracers // ignore: cast_nullable_to_non_nullable
+                  as List<Vector2>,
+        skin: null == skin
+            ? _value.skin
+            : skin // ignore: cast_nullable_to_non_nullable
+                  as String,
+        dead: null == dead
+            ? _value.dead
+            : dead // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        eliminations: null == eliminations
+            ? _value.eliminations
+            : eliminations // ignore: cast_nullable_to_non_nullable
+                  as int,
+        boostTimer: null == boostTimer
+            ? _value.boostTimer
+            : boostTimer // ignore: cast_nullable_to_non_nullable
+                  as double,
+        previousDropPosition: freezed == previousDropPosition
+            ? _value.previousDropPosition
+            : previousDropPosition // ignore: cast_nullable_to_non_nullable
+                  as Vector2?,
+        cachedDescription: freezed == cachedDescription
+            ? _value.cachedDescription
+            : cachedDescription // ignore: cast_nullable_to_non_nullable
+                  as SnakeDescription?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$SnakeEntityImpl extends _SnakeEntity {
-  const _$SnakeEntityImpl(
-      {required this.id,
-      required this.name,
-      @Vector2Converter() required this.head,
-      required this.angle,
-      required this.desiredAngle,
-      required this.score,
-      required this.boost,
-      @Vector2Converter() required final List<Vector2> tracers,
-      required this.skin,
-      required this.dead,
-      required this.eliminations,
-      this.boostTimer = 0.0,
-      @Vector2Converter() this.previousDropPosition,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      this.cachedDescription})
-      : _tracers = tracers,
-        super._();
+  const _$SnakeEntityImpl({
+    required this.id,
+    required this.name,
+    @Vector2Converter() required this.head,
+    required this.angle,
+    required this.desiredAngle,
+    required this.score,
+    required this.boost,
+    @Vector2Converter() required final List<Vector2> tracers,
+    required this.skin,
+    required this.dead,
+    required this.eliminations,
+    this.boostTimer = 0.0,
+    @Vector2Converter() this.previousDropPosition,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    this.cachedDescription,
+  }) : _tracers = tracers,
+       super._();
 
   factory _$SnakeEntityImpl.fromJson(Map<String, dynamic> json) =>
       _$$SnakeEntityImplFromJson(json);
@@ -593,21 +624,22 @@ class _$SnakeEntityImpl extends _SnakeEntity {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      head,
-      angle,
-      desiredAngle,
-      score,
-      boost,
-      const DeepCollectionEquality().hash(_tracers),
-      skin,
-      dead,
-      eliminations,
-      boostTimer,
-      previousDropPosition,
-      cachedDescription);
+    runtimeType,
+    id,
+    name,
+    head,
+    angle,
+    desiredAngle,
+    score,
+    boost,
+    const DeepCollectionEquality().hash(_tracers),
+    skin,
+    dead,
+    eliminations,
+    boostTimer,
+    previousDropPosition,
+    cachedDescription,
+  );
 
   @JsonKey(ignore: true)
   @override
@@ -617,29 +649,28 @@ class _$SnakeEntityImpl extends _SnakeEntity {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$SnakeEntityImplToJson(
-      this,
-    );
+    return _$$SnakeEntityImplToJson(this);
   }
 }
 
 abstract class _SnakeEntity extends SnakeEntity {
-  const factory _SnakeEntity(
-      {required final String id,
-      required final String name,
-      @Vector2Converter() required final Vector2 head,
-      required final double angle,
-      required final double desiredAngle,
-      required final int score,
-      required final bool boost,
-      @Vector2Converter() required final List<Vector2> tracers,
-      required final String skin,
-      required final bool dead,
-      required final int eliminations,
-      final double boostTimer,
-      @Vector2Converter() final Vector2? previousDropPosition,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      final SnakeDescription? cachedDescription}) = _$SnakeEntityImpl;
+  const factory _SnakeEntity({
+    required final String id,
+    required final String name,
+    @Vector2Converter() required final Vector2 head,
+    required final double angle,
+    required final double desiredAngle,
+    required final int score,
+    required final bool boost,
+    @Vector2Converter() required final List<Vector2> tracers,
+    required final String skin,
+    required final bool dead,
+    required final int eliminations,
+    final double boostTimer,
+    @Vector2Converter() final Vector2? previousDropPosition,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    final SnakeDescription? cachedDescription,
+  }) = _$SnakeEntityImpl;
   const _SnakeEntity._() : super._();
 
   factory _SnakeEntity.fromJson(Map<String, dynamic> json) =

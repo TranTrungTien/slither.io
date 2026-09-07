@@ -32,15 +32,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         children: [
           GameWidget<SlitherGame>(
             game: _game,
-            backgroundBuilder: (context) => Container(
-              color: CatppuccinColors.crust,
-            ),
+            backgroundBuilder: (context) =>
+                Container(color: CatppuccinColors.crust),
             overlayBuilderMap: {
               'hud': (context, game) => HudOverlay(game: game),
               'minimap': (context, game) => MinimapOverlay(game: game),
               'alerts': (context, game) => const AlertsOverlay(),
               'death': (context, game) {
-                final score = ref.read(snakeProvider)['local_player']?.score ?? 0;
+                final score =
+                    ref.read(snakeProvider)['local_player']?.score ?? 0;
                 return DeathOverlay(
                   finalScore: score,
                   onRestart: () {
